@@ -1,0 +1,620 @@
+\hypertarget{classui_experiment}{}\section{ui\+Experiment Class Reference}
+\label{classui_experiment}\index{ui\+Experiment@{ui\+Experiment}}
+
+
+{\ttfamily \#include $<$uiexp.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}{ui\+Experiment}} (const std\+::string \&file)
+\begin{DoxyCompactList}\small\item\em time step \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classui_experiment_a1efc79d41f673a12d42211d099bbc240}{$\sim$ui\+Experiment}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_af19926858d11ccf9cb6a732112e381ed}{init}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a82e71dbd631d00315763e0514608f0fb}{build\+F\+E\+M\+Space}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a1ec010eb71e06c6388d67bbe124c951b}{build\+D\+G\+F\+E\+M\+Space}} (int bmark=2)
+\item 
+void \mbox{\hyperlink{classui_experiment_a406d18d100eaa0c03139590bfa6092af}{update\+Geometry\+Cache}} (u\+\_\+int alg\+\_\+acc=3)
+\item 
+void \mbox{\hyperlink{classui_experiment_a0c145963361c8f511360e994833a48ef}{update\+D\+G\+Geometry\+Cache}} (u\+\_\+int alg\+\_\+acc=3)
+\item 
+void \mbox{\hyperlink{classui_experiment_a03675f636c0949ae93bed21719f9a820}{Dirichlet\+BC}} (\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}} \mbox{\hyperlink{complex__node___t_h_f_e_m_2parameter_8h_a0150c722a481cbca4663d2d8b9a9f903}{bnd}}, int bmark=1)
+\item 
+void \mbox{\hyperlink{classui_experiment_ab4c24c7ae47ac21530ea765bcb970543}{Neumman\+BC}} (\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_ab4380503f43da11284de79277e96e96b}{Cv\+Func}} g, int bmark=2)
+\item 
+void \mbox{\hyperlink{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}{get\+Rhs}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_ad09537c271da486d93b126d06e31dd2f}{get\+Mat}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}{solve}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}{get\+Error}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}{adapt\+Mesh}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}{get\+Indicator}} ()
+\item 
+virtual void \mbox{\hyperlink{classui_experiment_a62f19f7927000e2b2b6946513917aef4}{save\+Data}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}{run}} ()
+\item 
+\mbox{\hyperlink{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}{ui\+Experiment}} (const std\+::string \&file)
+\begin{DoxyCompactList}\small\item\em time step \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classui_experiment_a068797017d5804783e97385921c13253}{$\sim$ui\+Experiment}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_af19926858d11ccf9cb6a732112e381ed}{init}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a82e71dbd631d00315763e0514608f0fb}{build\+F\+E\+M\+Space}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_af36eded6a690c993106e851452b52c74}{build\+D\+G\+F\+E\+M\+Space}} (int bmark=11)
+\item 
+void \mbox{\hyperlink{classui_experiment_a406d18d100eaa0c03139590bfa6092af}{update\+Geometry\+Cache}} (u\+\_\+int alg\+\_\+acc=3)
+\item 
+void \mbox{\hyperlink{classui_experiment_a0c145963361c8f511360e994833a48ef}{update\+D\+G\+Geometry\+Cache}} (u\+\_\+int alg\+\_\+acc=3)
+\item 
+void \mbox{\hyperlink{classui_experiment_a03675f636c0949ae93bed21719f9a820}{Dirichlet\+BC}} (\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}} \mbox{\hyperlink{complex__node___t_h_f_e_m_2parameter_8h_a0150c722a481cbca4663d2d8b9a9f903}{bnd}}, int bmark=1)
+\item 
+void \mbox{\hyperlink{classui_experiment_afd027bbfa6350cfb77a0208721c56ebe}{Neumman\+BC}} (\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}} g, int bmark=11)
+\item 
+void \mbox{\hyperlink{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}{get\+Rhs}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_ad09537c271da486d93b126d06e31dd2f}{get\+Mat}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}{solve}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}{get\+Error}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}{adapt\+Mesh}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}{get\+Indicator}} ()
+\item 
+virtual void \mbox{\hyperlink{classui_experiment_a1b08fa8cc473ac030f73bcc46048cf45}{save\+Data}} ()
+\item 
+void \mbox{\hyperlink{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}{run}} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+H\+Geometry\+Tree$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a7b3828699381e953e413984d65c27c76}{h\+\_\+tree}}
+\item 
+Irregular\+Mesh$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a51e99f27dde8abd769e217d8192b1953}{ir\+\_\+mesh}}
+\item 
+std\+::string \mbox{\hyperlink{classui_experiment_ad22a4c3bcc758175bee8a9cc6112c37b}{mesh\+\_\+file}}
+\item 
+Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a2c9abfb62147cb378fd5a7f52e99560e}{triangle\+\_\+template\+\_\+geometry}}
+\begin{DoxyCompactList}\small\item\em mesh file \end{DoxyCompactList}\item 
+Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a83ec25f4aedfaca2d4878b15efc82315}{triangle\+\_\+coord\+\_\+transform}}
+\item 
+Template\+D\+OF$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a513ca14667fb30909ea3aef90e13200c}{triangle\+\_\+template\+\_\+dof}}
+\item 
+Basis\+Function\+Admin$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a4afff2bbca9b68fe61856dcf07456d2c}{triangle\+\_\+basis\+\_\+function}}
+\item 
+Unit\+Out\+Normal$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a5105926d18f9fc118426f833b63fbec6}{triangle\+\_\+unit\+\_\+out\+\_\+normal}}
+\item 
+Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a880d54a1384f86b7bacc8dfb476a20e6}{twin\+\_\+triangle\+\_\+template\+\_\+geometry}}
+\item 
+Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a6607a6e91fd6cd91332f6cda9964193f}{twin\+\_\+triangle\+\_\+coord\+\_\+transform}}
+\item 
+Template\+D\+OF$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a4f54e2b65f1b693be17259d4ec19e93b}{twin\+\_\+triangle\+\_\+template\+\_\+dof}}
+\item 
+Basis\+Function\+Admin$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_ab2decc2422c7eac7248bb615f629b312}{twin\+\_\+triangle\+\_\+basis\+\_\+function}}
+\item 
+Unit\+Out\+Normal$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a3240a812867c50cd296cff62e86731d5}{twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal}}
+\item 
+Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1 $>$ \mbox{\hyperlink{classui_experiment_a604866b155caa1e05fa9e23f37822885}{interval\+\_\+template\+\_\+geometry}}
+\item 
+Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a58e8bc2ca812d734691af34491626d5b}{interval\+\_\+to2d\+\_\+coord\+\_\+transform}}
+\item 
+std\+::vector$<$ Template\+Element$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_a9716ddbac22d7311f919fe55991e8930}{template\+\_\+element}}
+\item 
+std\+::vector$<$ Template\+D\+G\+Element$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_ac5384376bf5ff36cb3d5784876972f4d}{dg\+\_\+template\+\_\+element}}
+\item 
+D\+G\+F\+E\+M\+Space$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_ad4b0994c9d2bd5691065434080468700}{fem\+\_\+space}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_element_cache}{Element\+Cache}}$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_a86da24faea838d0a39a7b89d2f09c81c}{element\+\_\+cache}}
+\begin{DoxyCompactList}\small\item\em finite element space \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_edge_cache}{Edge\+Cache}}$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_a8c9962fa5c8eefe78f7d0612e0fd7dd2}{edge\+\_\+cache}}
+\item 
+F\+E\+M\+Function$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_aabad5b9464e03403d9c443b5130325f9}{u\+\_\+re}}
+\item 
+F\+E\+M\+Function$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_aa50bc0a5012bc931d4d42ca06c303a45}{u\+\_\+im}}
+\item 
+Eigen\+::\+Sparse\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Row\+Major $>$ \mbox{\hyperlink{classui_experiment_a8e554eb0972c60b11ee11dc44753ae97}{stiff\+\_\+matrix}}
+\item 
+Eigen\+::\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Dynamic, 1 $>$ \mbox{\hyperlink{classui_experiment_aaf0657e489f16f47ecf61b4bc0051648}{solution}}
+\item 
+Eigen\+::\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Dynamic, 1 $>$ \mbox{\hyperlink{classui_experiment_a0d42caa6e050d49531d7d006efbef6a8}{rhs}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2uiexp_8h_a8014ab9a69eccab08613f4642bbbddd5}{T}} $>$ \mbox{\hyperlink{classui_experiment_adc77b528327a0ac71f395005b2008568}{triplets}}
+\item 
+Indicator$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a8400becec774a3accdec7f0e7a102cbd}{indicator}}
+\item 
+Mesh\+Adaptor$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a3043c4d1d53dc7026d83398b7caa2010}{mesh\+\_\+adaptor}}
+\item 
+double \mbox{\hyperlink{classui_experiment_ab2f282868b75fb348ac4c99d2d84441e}{sys\+\_\+t0}} = 0
+\item 
+double \mbox{\hyperlink{classui_experiment_a636bedd4cd6e21255631fbaa556427f2}{dt}} = 1
+\begin{DoxyCompactList}\small\item\em system start time \end{DoxyCompactList}\item 
+Basis\+Function\+Admin$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a9877c48b948d57a73663d4b3a741d6ae}{triangle\+\_\+basis\+\_\+function}}
+\item 
+Basis\+Function\+Admin$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a20934ca922429d4b15fb94830a1475f1}{twin\+\_\+triangle\+\_\+basis\+\_\+function}}
+\item 
+std\+::vector$<$ Template\+Element$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_a7706058764736bd2091122372d448c78}{template\+\_\+element}}
+\item 
+D\+G\+F\+E\+M\+Space$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a7532fa0202196a17b46ea8a3c9241410}{fem\+\_\+space}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_element_cache}{Element\+Cache}}$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ \mbox{\hyperlink{classui_experiment_a3386a72dec8a1d7065f553f42d1f181b}{element\+\_\+cache}}
+\begin{DoxyCompactList}\small\item\em finite element space \end{DoxyCompactList}\item 
+F\+E\+M\+Function$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_aac4bf7e51a978a58d1dab5f0dcb62b54}{u\+\_\+re}}
+\item 
+F\+E\+M\+Function$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ \mbox{\hyperlink{classui_experiment_a52c236e8afbb37ae0baa97ada2305d93}{u\+\_\+im}}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}\label{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}} 
+\index{ui\+Experiment@{ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\index{ui\+Experiment@{ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{ui\+Experiment()}{uiExperiment()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily ui\+Experiment\+::ui\+Experiment (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file }\end{DoxyParamCaption})}
+
+
+
+time step 
+
+\mbox{\Hypertarget{classui_experiment_a1efc79d41f673a12d42211d099bbc240}\label{classui_experiment_a1efc79d41f673a12d42211d099bbc240}} 
+\index{ui\+Experiment@{ui\+Experiment}!````~ui\+Experiment@{$\sim$ui\+Experiment}}
+\index{````~ui\+Experiment@{$\sim$ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{$\sim$ui\+Experiment()}{~uiExperiment()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily ui\+Experiment\+::$\sim$ui\+Experiment (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}\label{classui_experiment_aaebdbaabc4e6ab6d83015dff92519d2c}} 
+\index{ui\+Experiment@{ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\index{ui\+Experiment@{ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{ui\+Experiment()}{uiExperiment()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily ui\+Experiment\+::ui\+Experiment (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file }\end{DoxyParamCaption})}
+
+
+
+time step 
+
+\mbox{\Hypertarget{classui_experiment_a068797017d5804783e97385921c13253}\label{classui_experiment_a068797017d5804783e97385921c13253}} 
+\index{ui\+Experiment@{ui\+Experiment}!````~ui\+Experiment@{$\sim$ui\+Experiment}}
+\index{````~ui\+Experiment@{$\sim$ui\+Experiment}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{$\sim$ui\+Experiment()}{~uiExperiment()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual ui\+Experiment\+::$\sim$ui\+Experiment (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}\label{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}} 
+\index{ui\+Experiment@{ui\+Experiment}!adapt\+Mesh@{adapt\+Mesh}}
+\index{adapt\+Mesh@{adapt\+Mesh}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{adapt\+Mesh()}{adaptMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::adapt\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}\label{classui_experiment_ab560aa75b58cc9bba585adf8f6ce7d76}} 
+\index{ui\+Experiment@{ui\+Experiment}!adapt\+Mesh@{adapt\+Mesh}}
+\index{adapt\+Mesh@{adapt\+Mesh}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{adapt\+Mesh()}{adaptMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::adapt\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a1ec010eb71e06c6388d67bbe124c951b}\label{classui_experiment_a1ec010eb71e06c6388d67bbe124c951b}} 
+\index{ui\+Experiment@{ui\+Experiment}!build\+D\+G\+F\+E\+M\+Space@{build\+D\+G\+F\+E\+M\+Space}}
+\index{build\+D\+G\+F\+E\+M\+Space@{build\+D\+G\+F\+E\+M\+Space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{build\+D\+G\+F\+E\+M\+Space()}{buildDGFEMSpace()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::build\+D\+G\+F\+E\+M\+Space (\begin{DoxyParamCaption}\item[{int}]{bmark = {\ttfamily 2} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_af36eded6a690c993106e851452b52c74}\label{classui_experiment_af36eded6a690c993106e851452b52c74}} 
+\index{ui\+Experiment@{ui\+Experiment}!build\+D\+G\+F\+E\+M\+Space@{build\+D\+G\+F\+E\+M\+Space}}
+\index{build\+D\+G\+F\+E\+M\+Space@{build\+D\+G\+F\+E\+M\+Space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{build\+D\+G\+F\+E\+M\+Space()}{buildDGFEMSpace()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::build\+D\+G\+F\+E\+M\+Space (\begin{DoxyParamCaption}\item[{int}]{bmark = {\ttfamily 11} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a82e71dbd631d00315763e0514608f0fb}\label{classui_experiment_a82e71dbd631d00315763e0514608f0fb}} 
+\index{ui\+Experiment@{ui\+Experiment}!build\+F\+E\+M\+Space@{build\+F\+E\+M\+Space}}
+\index{build\+F\+E\+M\+Space@{build\+F\+E\+M\+Space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{build\+F\+E\+M\+Space()}{buildFEMSpace()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::build\+F\+E\+M\+Space (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a82e71dbd631d00315763e0514608f0fb}\label{classui_experiment_a82e71dbd631d00315763e0514608f0fb}} 
+\index{ui\+Experiment@{ui\+Experiment}!build\+F\+E\+M\+Space@{build\+F\+E\+M\+Space}}
+\index{build\+F\+E\+M\+Space@{build\+F\+E\+M\+Space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{build\+F\+E\+M\+Space()}{buildFEMSpace()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::build\+F\+E\+M\+Space (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a03675f636c0949ae93bed21719f9a820}\label{classui_experiment_a03675f636c0949ae93bed21719f9a820}} 
+\index{ui\+Experiment@{ui\+Experiment}!Dirichlet\+BC@{Dirichlet\+BC}}
+\index{Dirichlet\+BC@{Dirichlet\+BC}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{Dirichlet\+B\+C()}{DirichletBC()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::\+Dirichlet\+BC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}}}]{bnd,  }\item[{int}]{bmark = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a03675f636c0949ae93bed21719f9a820}\label{classui_experiment_a03675f636c0949ae93bed21719f9a820}} 
+\index{ui\+Experiment@{ui\+Experiment}!Dirichlet\+BC@{Dirichlet\+BC}}
+\index{Dirichlet\+BC@{Dirichlet\+BC}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{Dirichlet\+B\+C()}{DirichletBC()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::\+Dirichlet\+BC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}}}]{bnd,  }\item[{int}]{bmark = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}\label{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Error@{get\+Error}}
+\index{get\+Error@{get\+Error}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Error()}{getError()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Error (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}\label{classui_experiment_a4a8beb61cd0e3061d9be1273c371cadf}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Error@{get\+Error}}
+\index{get\+Error@{get\+Error}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Error()}{getError()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Error (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}\label{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Indicator@{get\+Indicator}}
+\index{get\+Indicator@{get\+Indicator}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Indicator()}{getIndicator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Indicator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}\label{classui_experiment_aa01307f80d55f23738cd9ae0876280b3}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Indicator@{get\+Indicator}}
+\index{get\+Indicator@{get\+Indicator}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Indicator()}{getIndicator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Indicator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_ad09537c271da486d93b126d06e31dd2f}\label{classui_experiment_ad09537c271da486d93b126d06e31dd2f}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Mat@{get\+Mat}}
+\index{get\+Mat@{get\+Mat}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Mat()}{getMat()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Mat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_ad09537c271da486d93b126d06e31dd2f}\label{classui_experiment_ad09537c271da486d93b126d06e31dd2f}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Mat@{get\+Mat}}
+\index{get\+Mat@{get\+Mat}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Mat()}{getMat()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Mat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}\label{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Rhs@{get\+Rhs}}
+\index{get\+Rhs@{get\+Rhs}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Rhs()}{getRhs()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Rhs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}\label{classui_experiment_a1c015a570ae4f2a1c8db01275497753f}} 
+\index{ui\+Experiment@{ui\+Experiment}!get\+Rhs@{get\+Rhs}}
+\index{get\+Rhs@{get\+Rhs}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{get\+Rhs()}{getRhs()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::get\+Rhs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_af19926858d11ccf9cb6a732112e381ed}\label{classui_experiment_af19926858d11ccf9cb6a732112e381ed}} 
+\index{ui\+Experiment@{ui\+Experiment}!init@{init}}
+\index{init@{init}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_af19926858d11ccf9cb6a732112e381ed}\label{classui_experiment_af19926858d11ccf9cb6a732112e381ed}} 
+\index{ui\+Experiment@{ui\+Experiment}!init@{init}}
+\index{init@{init}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_ab4c24c7ae47ac21530ea765bcb970543}\label{classui_experiment_ab4c24c7ae47ac21530ea765bcb970543}} 
+\index{ui\+Experiment@{ui\+Experiment}!Neumman\+BC@{Neumman\+BC}}
+\index{Neumman\+BC@{Neumman\+BC}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{Neumman\+B\+C()}{NeummanBC()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::\+Neumman\+BC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_ab4380503f43da11284de79277e96e96b}{Cv\+Func}}}]{g,  }\item[{int}]{bmark = {\ttfamily 2} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_afd027bbfa6350cfb77a0208721c56ebe}\label{classui_experiment_afd027bbfa6350cfb77a0208721c56ebe}} 
+\index{ui\+Experiment@{ui\+Experiment}!Neumman\+BC@{Neumman\+BC}}
+\index{Neumman\+BC@{Neumman\+BC}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{Neumman\+B\+C()}{NeummanBC()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::\+Neumman\+BC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{complex__node___t_h_f_e_m_2emdefs_8h_af8816f473dfdd972d676674921eb65f3}{C\+Func}}}]{g,  }\item[{int}]{bmark = {\ttfamily 11} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}\label{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}} 
+\index{ui\+Experiment@{ui\+Experiment}!run@{run}}
+\index{run@{run}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}\label{classui_experiment_aab82b5571ffb6a05e3104b7fc50ca34a}} 
+\index{ui\+Experiment@{ui\+Experiment}!run@{run}}
+\index{run@{run}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a62f19f7927000e2b2b6946513917aef4}\label{classui_experiment_a62f19f7927000e2b2b6946513917aef4}} 
+\index{ui\+Experiment@{ui\+Experiment}!save\+Data@{save\+Data}}
+\index{save\+Data@{save\+Data}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{save\+Data()}{saveData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::save\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classui_experiment_a1b08fa8cc473ac030f73bcc46048cf45}\label{classui_experiment_a1b08fa8cc473ac030f73bcc46048cf45}} 
+\index{ui\+Experiment@{ui\+Experiment}!save\+Data@{save\+Data}}
+\index{save\+Data@{save\+Data}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{save\+Data()}{saveData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void ui\+Experiment\+::save\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}\label{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}} 
+\index{ui\+Experiment@{ui\+Experiment}!solve@{solve}}
+\index{solve@{solve}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{solve()}{solve()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::solve (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}\label{classui_experiment_a542aa9e02b2ff7f40975ecce7b00a304}} 
+\index{ui\+Experiment@{ui\+Experiment}!solve@{solve}}
+\index{solve@{solve}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{solve()}{solve()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::solve (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a0c145963361c8f511360e994833a48ef}\label{classui_experiment_a0c145963361c8f511360e994833a48ef}} 
+\index{ui\+Experiment@{ui\+Experiment}!update\+D\+G\+Geometry\+Cache@{update\+D\+G\+Geometry\+Cache}}
+\index{update\+D\+G\+Geometry\+Cache@{update\+D\+G\+Geometry\+Cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{update\+D\+G\+Geometry\+Cache()}{updateDGGeometryCache()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::update\+D\+G\+Geometry\+Cache (\begin{DoxyParamCaption}\item[{u\+\_\+int}]{alg\+\_\+acc = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a0c145963361c8f511360e994833a48ef}\label{classui_experiment_a0c145963361c8f511360e994833a48ef}} 
+\index{ui\+Experiment@{ui\+Experiment}!update\+D\+G\+Geometry\+Cache@{update\+D\+G\+Geometry\+Cache}}
+\index{update\+D\+G\+Geometry\+Cache@{update\+D\+G\+Geometry\+Cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{update\+D\+G\+Geometry\+Cache()}{updateDGGeometryCache()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::update\+D\+G\+Geometry\+Cache (\begin{DoxyParamCaption}\item[{u\+\_\+int}]{alg\+\_\+acc = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a406d18d100eaa0c03139590bfa6092af}\label{classui_experiment_a406d18d100eaa0c03139590bfa6092af}} 
+\index{ui\+Experiment@{ui\+Experiment}!update\+Geometry\+Cache@{update\+Geometry\+Cache}}
+\index{update\+Geometry\+Cache@{update\+Geometry\+Cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{update\+Geometry\+Cache()}{updateGeometryCache()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::update\+Geometry\+Cache (\begin{DoxyParamCaption}\item[{u\+\_\+int}]{alg\+\_\+acc = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classui_experiment_a406d18d100eaa0c03139590bfa6092af}\label{classui_experiment_a406d18d100eaa0c03139590bfa6092af}} 
+\index{ui\+Experiment@{ui\+Experiment}!update\+Geometry\+Cache@{update\+Geometry\+Cache}}
+\index{update\+Geometry\+Cache@{update\+Geometry\+Cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{update\+Geometry\+Cache()}{updateGeometryCache()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void ui\+Experiment\+::update\+Geometry\+Cache (\begin{DoxyParamCaption}\item[{u\+\_\+int}]{alg\+\_\+acc = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classui_experiment_ac5384376bf5ff36cb3d5784876972f4d}\label{classui_experiment_ac5384376bf5ff36cb3d5784876972f4d}} 
+\index{ui\+Experiment@{ui\+Experiment}!dg\+\_\+template\+\_\+element@{dg\+\_\+template\+\_\+element}}
+\index{dg\+\_\+template\+\_\+element@{dg\+\_\+template\+\_\+element}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{dg\+\_\+template\+\_\+element}{dg\_template\_element}}
+{\footnotesize\ttfamily std\+::vector$<$ Template\+D\+G\+Element$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ ui\+Experiment\+::dg\+\_\+template\+\_\+element\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a636bedd4cd6e21255631fbaa556427f2}\label{classui_experiment_a636bedd4cd6e21255631fbaa556427f2}} 
+\index{ui\+Experiment@{ui\+Experiment}!dt@{dt}}
+\index{dt@{dt}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{dt}{dt}}
+{\footnotesize\ttfamily double ui\+Experiment\+::dt = 1\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+system start time 
+
+\mbox{\Hypertarget{classui_experiment_a8c9962fa5c8eefe78f7d0612e0fd7dd2}\label{classui_experiment_a8c9962fa5c8eefe78f7d0612e0fd7dd2}} 
+\index{ui\+Experiment@{ui\+Experiment}!edge\+\_\+cache@{edge\+\_\+cache}}
+\index{edge\+\_\+cache@{edge\+\_\+cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{edge\+\_\+cache}{edge\_cache}}
+{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{struct_edge_cache}{Edge\+Cache}}$<$ double, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ $>$ ui\+Experiment\+::edge\+\_\+cache\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a3386a72dec8a1d7065f553f42d1f181b}\label{classui_experiment_a3386a72dec8a1d7065f553f42d1f181b}} 
+\index{ui\+Experiment@{ui\+Experiment}!element\+\_\+cache@{element\+\_\+cache}}
+\index{element\+\_\+cache@{element\+\_\+cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{element\+\_\+cache}{element\_cache}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{struct_element_cache}{Element\+Cache}}$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ $>$ ui\+Experiment\+::element\+\_\+cache\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+finite element space 
+
+\mbox{\Hypertarget{classui_experiment_a86da24faea838d0a39a7b89d2f09c81c}\label{classui_experiment_a86da24faea838d0a39a7b89d2f09c81c}} 
+\index{ui\+Experiment@{ui\+Experiment}!element\+\_\+cache@{element\+\_\+cache}}
+\index{element\+\_\+cache@{element\+\_\+cache}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{element\+\_\+cache}{element\_cache}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{struct_element_cache}{Element\+Cache}}$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ $>$ ui\+Experiment\+::element\+\_\+cache\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+finite element space 
+
+\mbox{\Hypertarget{classui_experiment_a7532fa0202196a17b46ea8a3c9241410}\label{classui_experiment_a7532fa0202196a17b46ea8a3c9241410}} 
+\index{ui\+Experiment@{ui\+Experiment}!fem\+\_\+space@{fem\+\_\+space}}
+\index{fem\+\_\+space@{fem\+\_\+space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{fem\+\_\+space}{fem\_space}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily D\+G\+F\+E\+M\+Space$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::fem\+\_\+space\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_ad4b0994c9d2bd5691065434080468700}\label{classui_experiment_ad4b0994c9d2bd5691065434080468700}} 
+\index{ui\+Experiment@{ui\+Experiment}!fem\+\_\+space@{fem\+\_\+space}}
+\index{fem\+\_\+space@{fem\+\_\+space}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{fem\+\_\+space}{fem\_space}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily D\+G\+F\+E\+M\+Space$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::fem\+\_\+space\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a7b3828699381e953e413984d65c27c76}\label{classui_experiment_a7b3828699381e953e413984d65c27c76}} 
+\index{ui\+Experiment@{ui\+Experiment}!h\+\_\+tree@{h\+\_\+tree}}
+\index{h\+\_\+tree@{h\+\_\+tree}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{h\+\_\+tree}{h\_tree}}
+{\footnotesize\ttfamily H\+Geometry\+Tree$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::h\+\_\+tree\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a8400becec774a3accdec7f0e7a102cbd}\label{classui_experiment_a8400becec774a3accdec7f0e7a102cbd}} 
+\index{ui\+Experiment@{ui\+Experiment}!indicator@{indicator}}
+\index{indicator@{indicator}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{indicator}{indicator}}
+{\footnotesize\ttfamily Indicator$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::indicator\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a604866b155caa1e05fa9e23f37822885}\label{classui_experiment_a604866b155caa1e05fa9e23f37822885}} 
+\index{ui\+Experiment@{ui\+Experiment}!interval\+\_\+template\+\_\+geometry@{interval\+\_\+template\+\_\+geometry}}
+\index{interval\+\_\+template\+\_\+geometry@{interval\+\_\+template\+\_\+geometry}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{interval\+\_\+template\+\_\+geometry}{interval\_template\_geometry}}
+{\footnotesize\ttfamily Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1 $>$ ui\+Experiment\+::interval\+\_\+template\+\_\+geometry\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a58e8bc2ca812d734691af34491626d5b}\label{classui_experiment_a58e8bc2ca812d734691af34491626d5b}} 
+\index{ui\+Experiment@{ui\+Experiment}!interval\+\_\+to2d\+\_\+coord\+\_\+transform@{interval\+\_\+to2d\+\_\+coord\+\_\+transform}}
+\index{interval\+\_\+to2d\+\_\+coord\+\_\+transform@{interval\+\_\+to2d\+\_\+coord\+\_\+transform}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{interval\+\_\+to2d\+\_\+coord\+\_\+transform}{interval\_to2d\_coord\_transform}}
+{\footnotesize\ttfamily Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}-\/1, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::interval\+\_\+to2d\+\_\+coord\+\_\+transform\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a51e99f27dde8abd769e217d8192b1953}\label{classui_experiment_a51e99f27dde8abd769e217d8192b1953}} 
+\index{ui\+Experiment@{ui\+Experiment}!ir\+\_\+mesh@{ir\+\_\+mesh}}
+\index{ir\+\_\+mesh@{ir\+\_\+mesh}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{ir\+\_\+mesh}{ir\_mesh}}
+{\footnotesize\ttfamily Irregular\+Mesh$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::ir\+\_\+mesh\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a3043c4d1d53dc7026d83398b7caa2010}\label{classui_experiment_a3043c4d1d53dc7026d83398b7caa2010}} 
+\index{ui\+Experiment@{ui\+Experiment}!mesh\+\_\+adaptor@{mesh\+\_\+adaptor}}
+\index{mesh\+\_\+adaptor@{mesh\+\_\+adaptor}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{mesh\+\_\+adaptor}{mesh\_adaptor}}
+{\footnotesize\ttfamily Mesh\+Adaptor$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::mesh\+\_\+adaptor\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_ad22a4c3bcc758175bee8a9cc6112c37b}\label{classui_experiment_ad22a4c3bcc758175bee8a9cc6112c37b}} 
+\index{ui\+Experiment@{ui\+Experiment}!mesh\+\_\+file@{mesh\+\_\+file}}
+\index{mesh\+\_\+file@{mesh\+\_\+file}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{mesh\+\_\+file}{mesh\_file}}
+{\footnotesize\ttfamily std\+::string ui\+Experiment\+::mesh\+\_\+file\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a0d42caa6e050d49531d7d006efbef6a8}\label{classui_experiment_a0d42caa6e050d49531d7d006efbef6a8}} 
+\index{ui\+Experiment@{ui\+Experiment}!rhs@{rhs}}
+\index{rhs@{rhs}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{rhs}{rhs}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Dynamic, 1 $>$ ui\+Experiment\+::rhs\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_aaf0657e489f16f47ecf61b4bc0051648}\label{classui_experiment_aaf0657e489f16f47ecf61b4bc0051648}} 
+\index{ui\+Experiment@{ui\+Experiment}!solution@{solution}}
+\index{solution@{solution}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{solution}{solution}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Dynamic, 1 $>$ ui\+Experiment\+::solution\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a8e554eb0972c60b11ee11dc44753ae97}\label{classui_experiment_a8e554eb0972c60b11ee11dc44753ae97}} 
+\index{ui\+Experiment@{ui\+Experiment}!stiff\+\_\+matrix@{stiff\+\_\+matrix}}
+\index{stiff\+\_\+matrix@{stiff\+\_\+matrix}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{stiff\+\_\+matrix}{stiff\_matrix}}
+{\footnotesize\ttfamily Eigen\+::\+Sparse\+Matrix$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a97d2dbb382a9b25c16c04fc1e1baacdb}{cvaltype}}, Eigen\+::\+Row\+Major $>$ ui\+Experiment\+::stiff\+\_\+matrix\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_ab2f282868b75fb348ac4c99d2d84441e}\label{classui_experiment_ab2f282868b75fb348ac4c99d2d84441e}} 
+\index{ui\+Experiment@{ui\+Experiment}!sys\+\_\+t0@{sys\+\_\+t0}}
+\index{sys\+\_\+t0@{sys\+\_\+t0}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{sys\+\_\+t0}{sys\_t0}}
+{\footnotesize\ttfamily double ui\+Experiment\+::sys\+\_\+t0 = 0\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a7706058764736bd2091122372d448c78}\label{classui_experiment_a7706058764736bd2091122372d448c78}} 
+\index{ui\+Experiment@{ui\+Experiment}!template\+\_\+element@{template\+\_\+element}}
+\index{template\+\_\+element@{template\+\_\+element}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{template\+\_\+element}{template\_element}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::vector$<$Template\+Element$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ $>$ ui\+Experiment\+::template\+\_\+element\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a9716ddbac22d7311f919fe55991e8930}\label{classui_experiment_a9716ddbac22d7311f919fe55991e8930}} 
+\index{ui\+Experiment@{ui\+Experiment}!template\+\_\+element@{template\+\_\+element}}
+\index{template\+\_\+element@{template\+\_\+element}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{template\+\_\+element}{template\_element}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::vector$<$Template\+Element$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ $>$ ui\+Experiment\+::template\+\_\+element\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a9877c48b948d57a73663d4b3a741d6ae}\label{classui_experiment_a9877c48b948d57a73663d4b3a741d6ae}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+basis\+\_\+function@{triangle\+\_\+basis\+\_\+function}}
+\index{triangle\+\_\+basis\+\_\+function@{triangle\+\_\+basis\+\_\+function}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+basis\+\_\+function}{triangle\_basis\_function}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Basis\+Function\+Admin$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::triangle\+\_\+basis\+\_\+function\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a4afff2bbca9b68fe61856dcf07456d2c}\label{classui_experiment_a4afff2bbca9b68fe61856dcf07456d2c}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+basis\+\_\+function@{triangle\+\_\+basis\+\_\+function}}
+\index{triangle\+\_\+basis\+\_\+function@{triangle\+\_\+basis\+\_\+function}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+basis\+\_\+function}{triangle\_basis\_function}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Basis\+Function\+Admin$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::triangle\+\_\+basis\+\_\+function\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a83ec25f4aedfaca2d4878b15efc82315}\label{classui_experiment_a83ec25f4aedfaca2d4878b15efc82315}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+coord\+\_\+transform@{triangle\+\_\+coord\+\_\+transform}}
+\index{triangle\+\_\+coord\+\_\+transform@{triangle\+\_\+coord\+\_\+transform}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+coord\+\_\+transform}{triangle\_coord\_transform}}
+{\footnotesize\ttfamily Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::triangle\+\_\+coord\+\_\+transform\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a513ca14667fb30909ea3aef90e13200c}\label{classui_experiment_a513ca14667fb30909ea3aef90e13200c}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+template\+\_\+dof@{triangle\+\_\+template\+\_\+dof}}
+\index{triangle\+\_\+template\+\_\+dof@{triangle\+\_\+template\+\_\+dof}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+template\+\_\+dof}{triangle\_template\_dof}}
+{\footnotesize\ttfamily Template\+D\+OF$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::triangle\+\_\+template\+\_\+dof\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a2c9abfb62147cb378fd5a7f52e99560e}\label{classui_experiment_a2c9abfb62147cb378fd5a7f52e99560e}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+template\+\_\+geometry@{triangle\+\_\+template\+\_\+geometry}}
+\index{triangle\+\_\+template\+\_\+geometry@{triangle\+\_\+template\+\_\+geometry}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+template\+\_\+geometry}{triangle\_template\_geometry}}
+{\footnotesize\ttfamily Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::triangle\+\_\+template\+\_\+geometry\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+mesh file 
+
+\mbox{\Hypertarget{classui_experiment_a5105926d18f9fc118426f833b63fbec6}\label{classui_experiment_a5105926d18f9fc118426f833b63fbec6}} 
+\index{ui\+Experiment@{ui\+Experiment}!triangle\+\_\+unit\+\_\+out\+\_\+normal@{triangle\+\_\+unit\+\_\+out\+\_\+normal}}
+\index{triangle\+\_\+unit\+\_\+out\+\_\+normal@{triangle\+\_\+unit\+\_\+out\+\_\+normal}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triangle\+\_\+unit\+\_\+out\+\_\+normal}{triangle\_unit\_out\_normal}}
+{\footnotesize\ttfamily Unit\+Out\+Normal$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::triangle\+\_\+unit\+\_\+out\+\_\+normal\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_adc77b528327a0ac71f395005b2008568}\label{classui_experiment_adc77b528327a0ac71f395005b2008568}} 
+\index{ui\+Experiment@{ui\+Experiment}!triplets@{triplets}}
+\index{triplets@{triplets}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{triplets}{triplets}}
+{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{complex__edge___t_h_f_e_m_2uiexp_8h_a8014ab9a69eccab08613f4642bbbddd5}{T}} $>$ ui\+Experiment\+::triplets\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a20934ca922429d4b15fb94830a1475f1}\label{classui_experiment_a20934ca922429d4b15fb94830a1475f1}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+basis\+\_\+function@{twin\+\_\+triangle\+\_\+basis\+\_\+function}}
+\index{twin\+\_\+triangle\+\_\+basis\+\_\+function@{twin\+\_\+triangle\+\_\+basis\+\_\+function}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+basis\+\_\+function}{twin\_triangle\_basis\_function}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Basis\+Function\+Admin$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+basis\+\_\+function\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_ab2decc2422c7eac7248bb615f629b312}\label{classui_experiment_ab2decc2422c7eac7248bb615f629b312}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+basis\+\_\+function@{twin\+\_\+triangle\+\_\+basis\+\_\+function}}
+\index{twin\+\_\+triangle\+\_\+basis\+\_\+function@{twin\+\_\+triangle\+\_\+basis\+\_\+function}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+basis\+\_\+function}{twin\_triangle\_basis\_function}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Basis\+Function\+Admin$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+basis\+\_\+function\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a6607a6e91fd6cd91332f6cda9964193f}\label{classui_experiment_a6607a6e91fd6cd91332f6cda9964193f}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+coord\+\_\+transform@{twin\+\_\+triangle\+\_\+coord\+\_\+transform}}
+\index{twin\+\_\+triangle\+\_\+coord\+\_\+transform@{twin\+\_\+triangle\+\_\+coord\+\_\+transform}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+coord\+\_\+transform}{twin\_triangle\_coord\_transform}}
+{\footnotesize\ttfamily Coord\+Transform$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}, \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+coord\+\_\+transform\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a4f54e2b65f1b693be17259d4ec19e93b}\label{classui_experiment_a4f54e2b65f1b693be17259d4ec19e93b}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+template\+\_\+dof@{twin\+\_\+triangle\+\_\+template\+\_\+dof}}
+\index{twin\+\_\+triangle\+\_\+template\+\_\+dof@{twin\+\_\+triangle\+\_\+template\+\_\+dof}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+template\+\_\+dof}{twin\_triangle\_template\_dof}}
+{\footnotesize\ttfamily Template\+D\+OF$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+template\+\_\+dof\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a880d54a1384f86b7bacc8dfb476a20e6}\label{classui_experiment_a880d54a1384f86b7bacc8dfb476a20e6}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+template\+\_\+geometry@{twin\+\_\+triangle\+\_\+template\+\_\+geometry}}
+\index{twin\+\_\+triangle\+\_\+template\+\_\+geometry@{twin\+\_\+triangle\+\_\+template\+\_\+geometry}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+template\+\_\+geometry}{twin\_triangle\_template\_geometry}}
+{\footnotesize\ttfamily Template\+Geometry$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+template\+\_\+geometry\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a3240a812867c50cd296cff62e86731d5}\label{classui_experiment_a3240a812867c50cd296cff62e86731d5}} 
+\index{ui\+Experiment@{ui\+Experiment}!twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal@{twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal}}
+\index{twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal@{twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal}{twin\_triangle\_unit\_out\_normal}}
+{\footnotesize\ttfamily Unit\+Out\+Normal$<$ \mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}} $>$ ui\+Experiment\+::twin\+\_\+triangle\+\_\+unit\+\_\+out\+\_\+normal\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_a52c236e8afbb37ae0baa97ada2305d93}\label{classui_experiment_a52c236e8afbb37ae0baa97ada2305d93}} 
+\index{ui\+Experiment@{ui\+Experiment}!u\+\_\+im@{u\+\_\+im}}
+\index{u\+\_\+im@{u\+\_\+im}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{u\+\_\+im}{u\_im}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily F\+E\+M\+Function$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::u\+\_\+im\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_aa50bc0a5012bc931d4d42ca06c303a45}\label{classui_experiment_aa50bc0a5012bc931d4d42ca06c303a45}} 
+\index{ui\+Experiment@{ui\+Experiment}!u\+\_\+im@{u\+\_\+im}}
+\index{u\+\_\+im@{u\+\_\+im}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{u\+\_\+im}{u\_im}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily F\+E\+M\+Function$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::u\+\_\+im\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_aac4bf7e51a978a58d1dab5f0dcb62b54}\label{classui_experiment_aac4bf7e51a978a58d1dab5f0dcb62b54}} 
+\index{ui\+Experiment@{ui\+Experiment}!u\+\_\+re@{u\+\_\+re}}
+\index{u\+\_\+re@{u\+\_\+re}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{u\+\_\+re}{u\_re}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily F\+E\+M\+Function$<$double,\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::u\+\_\+re\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classui_experiment_aabad5b9464e03403d9c443b5130325f9}\label{classui_experiment_aabad5b9464e03403d9c443b5130325f9}} 
+\index{ui\+Experiment@{ui\+Experiment}!u\+\_\+re@{u\+\_\+re}}
+\index{u\+\_\+re@{u\+\_\+re}!ui\+Experiment@{ui\+Experiment}}
+\subsubsection{\texorpdfstring{u\+\_\+re}{u\_re}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily F\+E\+M\+Function$<$\mbox{\hyperlink{complex__edge___t_h_f_e_m_2emdefs_8h_a0a0de407de54661e0d56aa8686c104d9}{vec\+\_\+type}},\mbox{\hyperlink{complex__node___t_h_f_e_m_2uiexp_8h_a589b8b9bfdf714f736059845d568b597}{D\+IM}}$>$ ui\+Experiment\+::u\+\_\+re\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+complex\+\_\+edge\+\_\+\+T\+H\+F\+E\+M/\mbox{\hyperlink{complex__edge___t_h_f_e_m_2uiexp_8h}{uiexp.\+h}}\item 
+complex\+\_\+edge\+\_\+\+T\+H\+F\+E\+M/\mbox{\hyperlink{complex__edge___t_h_f_e_m_2datacache_8cpp}{datacache.\+cpp}}\item 
+complex\+\_\+edge\+\_\+\+T\+H\+F\+E\+M/\mbox{\hyperlink{complex__edge___t_h_f_e_m_2uiexp_8cpp}{uiexp.\+cpp}}\end{DoxyCompactItemize}
