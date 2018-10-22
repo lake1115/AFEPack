@@ -60,7 +60,7 @@ For t In {0:1}
 
 	Call Ball;
 	Printf("Hole %g (center = {%g,%g,%g}, radius = %g) has number %g!",t, x, y, z, r, v1) ;
-	r -= 0.2;
+	r -= 1;
 	Physical Volume(t) = v1 ;
 EndFor
 
