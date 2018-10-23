@@ -17,12 +17,12 @@ cvaltype get_h(int n)
   return h;
 }
 
-cvaltype uiExperiment::get_u_hat(int order,cvaltype cout)
+cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
 {
   double M = 0;
   double theta;
   cvaltype u_hat = 0;
-  double n = 1.0*order;
+  double N = 1.0*n;
   //cvaltype H_n = boost::math::cyl_hankel_1(0,kappa*R);
   const u_int& n_dof = fem_space.n_dof();
   for(int i = 0; i<n_dof; i++){
@@ -35,7 +35,7 @@ cvaltype uiExperiment::get_u_hat(int order,cvaltype cout)
       theta += 2*PI;
     //cvaltype u_ex = u_exact(point);
     //u_hat += u_ex*exp(-1.0*I*n*theta);
-    u_hat += cout*exp(-1.0*I*n*theta);
+    u_hat += cout*exp(-1.0*I*N*theta);
     M++;
   }
   u_hat = u_hat/M;
@@ -128,35 +128,23 @@ void uiExperiment::DirichletBC(CFunc bnd,int bmark)
 
 void uiExperiment::NeummanBC(CFunc g,int bmark)
 {
-  // don't need to use datacache, because each boundary treat independent and only use once.
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
   DGFEMSpace<double,DIM>::DGElementIterator
     the_dgele = fem_space.beginDGElement(),
     end_dgele = fem_space.endDGElement();
-  for (;the_dgele != end_dgele;++ the_dgele) 
+  for (u_int i =0;the_dgele != end_dgele;++ the_dgele,++ i) 
     {
-      double vol = the_dgele->templateElement().volume();
-      const QuadratureInfo<DIM-1>& qi = the_dgele->findQuadratureInfo(3);
-      int n_q_pnt = qi.n_quadraturePoint();
-      std::vector<double> jac = the_dgele->local_to_global_jacobian(qi.quadraturePoint());
-      std::vector<AFEPack::Point<DIM> > q_pnt = the_dgele->local_to_global(qi.quadraturePoint());
-		
-      Element<double,DIM> *p_neigh0 = the_dgele->p_neighbourElement(0);
-      Element<double,DIM> *p_neigh1 = the_dgele->p_neighbourElement(1);
-      // only one neighbourelement in boundary
-      if(p_neigh1 != NULL){
-	std::cerr<<"Error: Neumman boundary element only have one neighbour"<<std::endl;
-	getchar();
-      }
-      std::vector<std::vector<double> > bas_val = p_neigh0->basis_function_value(q_pnt);
-
-      const std::vector<int>& dgele_dof = p_neigh0->dof();
+      //const u_int& edge_idx = the_dgele->index();
+      EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
+      std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+      const int& n_q_pnt = edgec.n_quad_pnt;
+      std::vector<std::vector<double> > bas_val = edgec.basis_value;
+      const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
       int n_dgele_dof = dgele_dof.size();
-
       for(int l=0;l<n_q_pnt;l++){
-	double Jxw = vol*qi.weight(l)*jac[l];
+	double Jxw = edgec.Jxw[l];
 	cvaltype g_val = g(q_pnt[l]);
 	cvaltype q_val = q(q_pnt[l]);
 	for(int j=0;j<n_dgele_dof;j++){
@@ -171,11 +159,12 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
   stiff_matrix.setZero();
   stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
   std::cout << "Neumman boundary condition ... OK!"<<std::endl;
+
+      
 };
 
-void uiExperiment::TransparentBC(int order,int bmark)
+void uiExperiment::TransparentBC(int bmark)
 {
-  // don't need to use datacache, because each boundary treat independent and only use once.
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
@@ -185,33 +174,21 @@ void uiExperiment::TransparentBC(int order,int bmark)
   for(int n=-order;n<=order;n++){
     H = get_h(n);
     //u_hat = get_u_hat(n,1);
-    //std::cout<<"u_hat = "<<u_hat<<" n = "<< n<<std::endl;
-    double o = 1.0*n;
+    double N = 1.0*n;
     DGFEMSpace<double,DIM>::DGElementIterator
       the_dgele = fem_space.beginDGElement(),
       end_dgele = fem_space.endDGElement();
-    for (;the_dgele != end_dgele;++ the_dgele) 
+    for (u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i) 
       {
-	double vol = the_dgele->templateElement().volume();
-	const QuadratureInfo<DIM-1>& qi = the_dgele->findQuadratureInfo(3);
-	int n_q_pnt = qi.n_quadraturePoint();
-	std::vector<double> jac = the_dgele->local_to_global_jacobian(qi.quadraturePoint());
-	std::vector<AFEPack::Point<DIM> > q_pnt = the_dgele->local_to_global(qi.quadraturePoint());
-		
-	Element<double,DIM> *p_neigh0 = the_dgele->p_neighbourElement(0);
-	Element<double,DIM> *p_neigh1 = the_dgele->p_neighbourElement(1);
-	// only one neighbourelement in boundary
-	if(p_neigh1 != NULL){
-	  std::cerr<<"Error: Neumman boundary element only have one neighbour"<<std::endl;
-	  getchar();
-	}
-	std::vector<std::vector<double> > bas_val = p_neigh0->basis_function_value(q_pnt);
-
-	const std::vector<int>& dgele_dof = p_neigh0->dof();
+	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
+	std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+	const int& n_q_pnt = edgec.n_quad_pnt;
+	std::vector<std::vector<double> > bas_val = edgec.basis_value;
+	const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
 	int n_dgele_dof = dgele_dof.size();
 
 	for(int l=0;l<n_q_pnt;l++){
-	  double Jxw = vol*qi.weight(l)*jac[l];
+	  double Jxw = edgec.Jxw[l];
 	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
 	  if(theta<0)
 	    theta += 2*PI;
@@ -221,7 +198,7 @@ void uiExperiment::TransparentBC(int order,int bmark)
 	    //////////////////
 	    
 	    for(int k=0;k<n_dgele_dof;k++){
-	      cvaltype cout = Jxw*exp(I*o*theta)*bas_val[j][l]*bas_val[k][l];
+	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l]*bas_val[k][l];
 	      cvaltype value = -1/R*H*get_u_hat(n,cout);
 	      triplets.push_back(T(dgele_dof[j],dgele_dof[k],value));
 	    } 
@@ -241,11 +218,12 @@ void uiExperiment::getExactVal()
 {
   u_exact_re.reinit(fem_space);
   u_exact_im.reinit(fem_space);
-
+  Error.reinit(fem_space);
   for(int i=0;i<fem_space.n_dof();i++){
     const Point<DIM> point = fem_space.dofInfo(i).interp_point;
     u_exact_re(i) = u_exact(point).real();
     u_exact_im(i) = u_exact(point).imag();
+    Error(i) = std::abs(u_exact_re(i)+I*u_exact_im(i)-u_re(i)-I*u_im(i));
     
   }
 }
@@ -275,13 +253,12 @@ void uiExperiment::getL1Error()
   }
   
   std::cerr << "\n1 error = " << L1error << std::endl;
-  //std::cerr << "\nL2 gradient error = " << L2error_grad << std::endl;
 }
 
 void uiExperiment::getError()
 {  
   double L2error = 0;
-  //double L2error_grad = 0;
+  double L2error_grad = 0;
 
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space.beginElement(),
@@ -294,26 +271,49 @@ void uiExperiment::getError()
     const int& n_q_pnt = ec.n_quad_pnt;
     std::vector<double> u_re_val = u_re.value(q_pnt,*the_ele);
     std::vector<double> u_im_val = u_im.value(q_pnt,*the_ele);
-    //std::vector<std::vector<double> > u_re_grad = u_re.gradient(q_pnt,*the_ele);
-    //std::vector<std::vector<double> > u_im_grad = u_im.gradient(q_pnt,*the_ele);
+    std::vector<std::vector<double> > u_re_grad = u_re.gradient(q_pnt,*the_ele);
+    std::vector<std::vector<double> > u_im_grad = u_im.gradient(q_pnt,*the_ele);
+    cvaltype residual = 0.0;
     for (int l = 0; l < n_q_pnt; l++){
       double Jxw = ec.Jxw[l];
+      cvaltype a_val = a(q_pnt[l]);
+      cvaltype c_val = c(q_pnt[l]); 
       cvaltype u_h_val(u_re_val[l],u_im_val[l]);
-      //cvaltype u_h_grad0(u_re_grad[l][0],u_im_grad[l][0]);
-      //cvaltype u_h_grad1(u_re_grad[l][1],u_im_grad[l][1]);
-      //cvaltype u_h_grad = sqrt(u_h_grad0*u_h_grad0+u_h_grad1*u_h_grad1);
-      double df_value = std::abs(u_exact(q_pnt[l])-u_h_val);
-      //double df_grad = std::abs(u_exact_prime(q_pnt[l])-u_h_grad);
-      L2error += Jxw*df_value*df_value;
-      //L2error_grad += Jxw*df_grad*df_grad;
+      std::vector<cvaltype> u_h_grad(2);
+      u_h_grad[0] = u_re_grad[l][0]+I*u_im_grad[l][0];
+      u_h_grad[1] = u_re_grad[l][1]+I*u_im_grad[l][1];
+      cvaltype u_exact_val = u_exact(q_pnt[l]);
+      cvec_type u_exact_grad = u_exact_prime(q_pnt[l]);
+      
+      double df_value = std::norm(u_exact_val-u_h_val);
+      double df_grad = std::norm(u_exact_grad[0]-u_h_grad[0])+std::norm(u_exact_grad[1]-u_h_grad[1]);
+      
+      L2error += Jxw*df_value;
+      L2error_grad += Jxw*df_grad;
+
+      residual += Jxw*(-c_val*(u_h_grad[0]*u_h_grad[0]+u_h_grad[1]*u_h_grad[1])+a_val*u_h_val);
     }
+    ec.residual = std::abs(residual);
   }
   L2error = sqrt(fabs(L2error));
-  // L2error_grad = sqrt(fabs(L2error_grad));
+  L2error_grad = sqrt(fabs(L2error_grad));
   
   std::cerr << "\nL2 error = " << L2error << std::endl;
-  //std::cerr << "\nL2 gradient error = " << L2error_grad << std::endl;y
+  std::cerr << "\nL2 gradient error = " << L2error_grad << std::endl;
 }
+
+void uiExperiment::getError_h()
+{
+  RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
+  u_int n_ele = mesh.n_geometry(DIM);
+  double error_h = 0.0;
+  for(u_int i=0;i<n_ele;i++){
+    error_h += indicator[i]*indicator[i];
+  }
+  error_h = sqrt(error_h);
+  std::cout << "\nL2 error_h = " << error_h << std::endl;
+}
+
 
 void uiExperiment::adaptMesh()
 {
@@ -394,6 +394,8 @@ void uiExperiment::getIndicator()
 uiExperiment::uiExperiment(const std::string& file)
 {
   mesh_file = file;
+  order = Order;
+  n_bmark = 2;
 };
 
 uiExperiment::~uiExperiment()
@@ -504,10 +506,23 @@ void uiExperiment::buildFEMSpace()
   std::cout << "Update Data Cache ...";
   updateGeometryCache();
   std::cout << "OK!" << std::endl;
+  // for record Neumman bc bmark
+  edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
 
 }
 void uiExperiment::buildDGFEMSpace(int bmark)
 {
+  std::vector<int>::iterator ret;
+  ret = std::find(bmark_list.begin(),bmark_list.end(),bmark);
+  if(ret == bmark_list.end()){
+    bmark_count = bmark_list.size();
+    bmark_list.push_back(bmark);
+  }
+  else{
+    int pos = ret - bmark_list.begin();
+    bmark_count = pos;
+  }
+
   Mesh<DIM,DIM>& mesh = fem_space.mesh();
   // calculate Neumann boundary number
   int n_side = mesh.n_geometry(DIM-1);
@@ -527,6 +542,14 @@ void uiExperiment::buildDGFEMSpace(int bmark)
     }
   }
   fem_space.buildDGElement();
+  
+  std::cout << "Update DG Data Cache ...";
+  std::cout << " bmark: "<<bmark<<" ..."<< " side: "<< n_dg_ele<<" ...";
+  if(bmark_count == n_bmark)
+    std::cerr<<"Error: not enough bmark number"<<std::endl;
+  updateDGGeometryCache(edge_cache[bmark_count]);
+  std::cout << "OK!" << std::endl;
+
 }
 
 void uiExperiment::solve()
@@ -535,11 +558,11 @@ void uiExperiment::solve()
   getMat();
   getRhs();
   
-  //NeummanBC(g,1);
+  NeummanBC(g,1);
 
   //TransparentBC(5,2);
   
-  DirichletBC(bnd,1);
+  DirichletBC(bnd,2);
   //NeummanBC(g1,2);
   //DirichletBC(bnd,1);
   Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
@@ -565,7 +588,7 @@ void writeMatlabData(const std::string& filename, FEMFunction<double,DIM> u_h)
   const FEMSpace<double,DIM>& fem_space = u_h.femSpace();
   for(int i = 0;i < n_dof;++ i){
     const Point<DIM>& interp_point = fem_space.dofInfo(i).interp_point;
-    file << interp_point[0] << " " << interp_point[1] << " " << u_h(i) << std::endl;
+    file << interp_point[0] << " " << interp_point[1] << " " << interp_point[2] << " " << u_h(i) << std::endl;
   }
   file.close();
 
@@ -575,9 +598,10 @@ void uiExperiment::saveData()
 {
   u_re.writeOpenDXData("u_re.dx");
   u_im.writeOpenDXData("u_im.dx");
-  u_exact_re.writeOpenDXData("u_exact_re.dx");
-  writeMatlabData("u_r.dat",u_re);
-  writeMatlabData("u_i.dat",u_im);
+  //u_exact_re.writeOpenDXData("u_exact_re.dx");
+  Error.writeOpenDXData("error.dx");
+  //writeMatlabData("u_r.dat",u_re);
+  //writeMatlabData("u_i.dat",u_im);
 };
 
 

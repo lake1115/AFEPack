@@ -1,18 +1,11 @@
 /*****************************************************************************
- *         
- *   Authors	: Bin Hu , Zhejiang University 
  *
- *   Project	: FEM for EM
- *
- *   $Revision: 1.10 $
- *   $Date: 2018/04/17  $
- *  
  *   @file emdefs.h
+ *   @author Hu Bin <binh@zju.edu.cn>
+ *   @data 2018/10/23
+ *
  *   @brief Constants, definitions 
  *
- *  $Log: emdefs.h $ 
- *  Revision 1.10  2018/05/02  binhu
- *  add complex valtype
  *****************************************************************************
  */
 #ifndef EMDEFS_H

@@ -1,17 +1,16 @@
 /*****************************************************************************
  *         
- *   Authors	: Bin Hu , Zhejiang University 
+ *   @file main.cpp
+ *   @author Hu Bin <binh@zju.edu.cn>
+ *   @data 2018/10/23
  *
- *   Project	: FEM for EM
- *
- *   $Revision: 1.0 $
- *   $Date: 2018/04/17  $
- *   
  *   @brief solve the PDE  -d/dx(c * du/dx) - d/dy(c * du/dy) + a * u = f 
  *   @input parameter c, a, f and boundary condition in parameter.h
  *
  *   Dirichlet boundary :  u = bnd;
  *   Neumann boundary :   n*c*grad(u) + q*u = g  
+ *
+ *   ./main meshfile
  *
  *****************************************************************************
  */

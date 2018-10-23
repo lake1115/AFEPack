@@ -8,7 +8,12 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
 			       ElementCache<value_type,DIM>& ec 
 			       )
 {
-  
+  FEMSpace<double,DIM>& sp = ele.femSpace();
+  Mesh<DIM>& mesh = sp.mesh();
+  GeometryBM& geo = ele.geometry();
+  u_int n_bnd = geo.n_boundary();
+  barycenter(mesh, geo, ec.bc);
+
   double volume = ele.templateElement().volume(); 
   const QuadratureInfo<DIM>& quad_info = ele.findQuadratureInfo(alg_acc); 
   int& n_quad_pnt = ec.n_quad_pnt; 
@@ -17,12 +22,12 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   std::vector<double> jacobian = ele.local_to_global_jacobian(quad_pnt);
   std::vector<Point<DIM> >& q_pnt = ec.q_pnt; 
   q_pnt = ele.local_to_global(quad_pnt);
-  
-  //ec.val.resize(ec.n_quad_pnt);
+  ec.volume = 0.0;
   ec.Jxw.resize(n_quad_pnt);
   for (int l = 0;l < n_quad_pnt;l ++) {
     double& Jxw = ec.Jxw[l];
     Jxw = volume*jacobian[l]*quad_info.weight(l);
+    ec.volume += Jxw;
   }
 }
 
@@ -32,11 +37,12 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
 			    EdgeCache<value_type,DIM>& ec 
 			    )
 {
-  Element<value_type,DIM>& ele = edge.neighbourElement(0);
-  
-  //  FEMSpace<value_type,DIM>& sp = ele.femSpace();
-  //Mesh<DIM>& mesh = sp.mesh();
-  //GeometryBM& geo = edge.geometry();
+  Element<value_type,DIM>& ele = edge.neighbourElement(0); 
+  FEMSpace<value_type,DIM>& sp = ele.femSpace();
+  Mesh<DIM>& mesh = sp.mesh();
+  GeometryBM& geo = edge.geometry();
+
+  barycenter(mesh, geo, ec.bc);
   
   double volume = edge.templateElement().volume(); 
   const QuadratureInfo<DIM-1>& quad_info = edge.findQuadratureInfo(alg_acc); 
@@ -48,14 +54,13 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
 
   q_pnt = edge.local_to_global(quad_pnt);
   ec.un = unitOutNormal(q_pnt, ele, edge);
-  
+  ec.volume = 0.0;
   ec.Jxw.resize(n_quad_pnt);
-  // ec.val[0].resize(n_quad_pnt);
-  //ec.val[1].resize(n_quad_pnt);
   
   for (int l = 0;l < n_quad_pnt;l ++) {
     double& Jxw = ec.Jxw[l];
-    Jxw = volume*jacobian[l]*quad_info.weight(l); 
+    Jxw = volume*jacobian[l]*quad_info.weight(l);
+    ec.volume += Jxw;
   }
 }
 
@@ -80,25 +85,31 @@ void uiExperiment::updateGeometryCache(u_int alg_acc)
   }
 }
 
-void uiExperiment::updateDGGeometryCache(u_int alg_acc)
+void uiExperiment::updateDGGeometryCache(std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc)
 {
   u_int n_side = fem_space.n_DGElement();
   edge_cache.clear();
   edge_cache.resize(n_side);
-  DGFEMSpace<double,DIM>::DGElementIterator the_dgele = fem_space.beginDGElement();
-  DGFEMSpace<double,DIM>::DGElementIterator end_dgele = fem_space.endDGElement();
-  for(;the_dgele != end_dgele;++ the_dgele){
+  DGFEMSpace<double,DIM>::DGElementIterator
+    the_dgele = fem_space.beginDGElement(),
+    end_dgele = fem_space.endDGElement();
+  for(u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i){
     DGElement<double,DIM>& edge = *the_dgele;
     const u_int& edge_idx = edge.index();
-    EdgeCache<double,DIM>& ec = edge_cache[edge_idx];
+    EdgeCache<double,DIM>& ec = edge_cache[i];
+    ec.idx = edge_idx;
     updateEdgeGeometryInfo(edge, alg_acc, ec); 
     Element<double,DIM>* p_neigh = edge.p_neighbourElement(0);
     ec.basis_value = p_neigh->basis_function_value(ec.q_pnt);
     ec.basis_gradient = p_neigh->basis_function_gradient(ec.q_pnt);
-    p_neigh = edge.p_neighbourElement(1); 
+    ec.p_neigh = p_neigh;
+    p_neigh = edge.p_neighbourElement(1);
+    ec.p_neigh2 = p_neigh;
+    /*
     if (p_neigh != NULL) {
       std::cerr<<"Error: edge elements only have one neighbourelement"<<std::endl;
     }
+    */
   }
 }
 

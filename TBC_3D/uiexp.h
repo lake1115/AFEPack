@@ -7,7 +7,7 @@
 const int DIM = 3;
 const int DOW = DIM;
 const int TDIM = DIM;
-//const int vector_length = DIM; 
+const int vector_length = DIM; 
 
 //#include <AFEPack/AMGSolver.h>       
 #include <AFEPack/HGeometry.h>		 	
@@ -84,14 +84,15 @@ public:
  DGFEMSpace<double,DIM> fem_space; /// finite element space
 
  std::vector<ElementCache<double,DIM> > element_cache;
- std::vector<EdgeCache<double,DIM> > edge_cache;
+ std::vector<EdgeCache<double,DIM> >* edge_cache;
  
  FEMFunction<double,DIM> u_re;    
  FEMFunction<double,DIM> u_im;    
 
  FEMFunction<double,DIM> u_exact_re;
  FEMFunction<double,DIM> u_exact_im;
- 
+
+ FEMFunction<double,DIM> Error;
  
  Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> stiff_matrix;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> solution;
@@ -104,7 +105,12 @@ public:
  
  double sys_t0 = 0;		///system start time
  double dt = 1;			/// time step
+ int order;
 
+ int n_bmark;
+ int bmark_count;
+ std::vector<int> bmark_list;
+ 
  cvaltype u_hat;
  
  public:
@@ -115,18 +121,19 @@ public:
  // initial FEMspace
  void init();
  void buildFEMSpace();
- void buildDGFEMSpace(int bmark=2);
+ void buildDGFEMSpace(int bmark);
  void updateGeometryCache(u_int alg_acc=3);
- void updateDGGeometryCache(u_int alg_acc=3);
+ void updateDGGeometryCache(std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc=3);
  void DirichletBC(CFunc bnd,int bmark=1);
- void NeummanBC(CFunc g,int bmark=2);
+ void NeummanBC(CFunc g,int bmark);
  void getRhs();
  void getMat();
- cvaltype get_u_hat(int order,cvaltype cout);
- void TransparentBC(int order,int bmark=2);
+ cvaltype get_u_hat(int n,cvaltype cout);
+ void TransparentBC(int bmark);
  void solve();
  void getError();
  void getL1Error();
+ void getError_h();
  void getExactVal();
  void adaptMesh();
  void getIndicator();

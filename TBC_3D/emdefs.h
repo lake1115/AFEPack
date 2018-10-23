@@ -1,18 +1,11 @@
-/*****************************************************************************
- *         
- *   Authors	: Bin Hu , Zhejiang University 
- *
- *   Project	: FEM for EM
- *
- *   $Revision: 1.10 $
- *   $Date: 2018/04/17  $
+/*****************************************************************************         
  *  
  *   @file emdefs.h
+ *   @author Hu Bin <binh@zju.edu.cn>
+ *   @data 2018/10/23
+ *
  *   @brief Constants, definitions 
  *
- *  $Log: emdefs.h $ 
- *  Revision 1.10  2018/05/02  binhu
- *  add complex valtype
  *****************************************************************************
  */
 #ifndef EMDEFS_H
@@ -21,10 +14,11 @@
 #include <cmath>
 #include <complex>
 
-//#define vec_type nVector<vector_length,double>	/// vector_value type
 
 typedef double valtype;
 typedef std::complex<valtype> cvaltype;
+
+typedef nVector<vector_length,cvaltype> cvec_type;
 
 #ifndef COMPLEX
 typedef valtype emtype;
