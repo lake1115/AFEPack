@@ -76,7 +76,7 @@ public:
  UnitOutNormal<DIM> four_tetrahedron_unit_out_normal;
 
  TemplateGeometry<DIM-1> triangle_template_geometry;
- CoordTransform<DIM-1,DIM> triangle_coord_transform;
+ CoordTransform<DIM-1,DIM> triangle_to3d_coord_transform;
  
  std::vector<TemplateElement<double,DIM,DIM>> template_element;
  std::vector<TemplateDGElement<DIM-1,DIM>> dg_template_element;
@@ -128,7 +128,7 @@ public:
  void NeummanBC(CFunc g,int bmark);
  void getRhs();
  void getMat();
- cvaltype get_u_hat(int n,cvaltype cout);
+ cvaltype get_u_hat(unsigned n, int m,cvaltype cout);
  void TransparentBC(int bmark);
  void solve();
  void getError();

@@ -19,6 +19,7 @@ cvaltype get_h(int n)
 
 cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
 {
+  // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i)) 
   double M = 0;
   double theta;
   cvaltype u_hat = 0;
@@ -33,9 +34,9 @@ cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
     theta = atan2(point[1],point[0]);
     if(theta < 0)
       theta += 2*PI;
-    //cvaltype u_ex = u_exact(point);
-    //u_hat += u_ex*exp(-1.0*I*n*theta);
-    u_hat += cout*exp(-1.0*I*N*theta);
+    cvaltype u_ex = u_exact(point);
+    u_hat += u_ex*exp(-1.0*I*N*theta);
+    //u_hat += cout*exp(-1.0*I*N*theta);
     M++;
   }
   u_hat = u_hat/M;
@@ -172,7 +173,7 @@ void uiExperiment::TransparentBC(int bmark)
   double theta;
   for(int n=-order;n<=order;n++){
     H = get_h(n);
-    //u_hat = get_u_hat(n,1);
+    u_hat = get_u_hat(n,1);
     double N = 1.0*n;
     DGFEMSpace<double,DIM>::DGElementIterator
       the_dgele = fem_space.beginDGElement(),
@@ -193,14 +194,15 @@ void uiExperiment::TransparentBC(int bmark)
 	    theta += 2*PI;
 	  for(int j=0;j<n_dgele_dof;j++){
 	    ///////////////////
-	    //rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*o*theta)*Jxw*bas_val[j][l];
+	    rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*N*theta)*Jxw*bas_val[j][l];
 	    //////////////////
-	    
+	    /*
 	    for(int k=0;k<n_dgele_dof;k++){
 	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l]*bas_val[k][l];
 	      cvaltype value = -1/R*H*get_u_hat(n,cout);
 	      triplets.push_back(T(dgele_dof[j],dgele_dof[k],value));
 	    } 
+	    */
 	    
 	  }
 	}
@@ -317,7 +319,7 @@ void uiExperiment::adaptMesh()
 {
   std::cout<<"********** Begin Adapt Mesh **********"<<std::endl;
   mesh_adaptor.reinit(ir_mesh);
-  mesh_adaptor.convergenceOrder() = 1;
+  mesh_adaptor.convergenceOrder() = 0;
   mesh_adaptor.refineStep() = 0;
   mesh_adaptor.setIndicator(indicator);
   mesh_adaptor.tolerence() = 0.0008;

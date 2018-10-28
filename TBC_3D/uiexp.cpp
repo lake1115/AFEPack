@@ -1,44 +1,43 @@
 #include "uiexp.h"
 #include "parameter.h"
-//#include <boost/math/special_functions/bessel.hpp>
-//#include <boost/math/special_functions/bessel_prime.hpp>
-//#include <boost/math/special_functions/hankel.hpp>
 
-cvaltype get_h(int n)
+cvaltype get_Theta(int n)
 {
   cvaltype h;
   double z = kappa*R;
-  cvaltype H_n = boost::math::cyl_hankel_1(n,z);
+  cvaltype H_n = boost::math::sph_hankel_1(n,z);
   double j_prime,y_prime;
-  j_prime = boost::math::cyl_bessel_j_prime(n,z);
-  y_prime = boost::math::cyl_neumann_prime(n,z);
+  j_prime = boost::math::sph_bessel_prime(n,z);
+  y_prime = boost::math::sph_neumann_prime(n,z);
   cvaltype H_n_prime(j_prime,y_prime);
   h = z*H_n_prime/H_n;
   return h;
 }
 
-cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
+cvaltype uiExperiment::get_u_hat(unsigned n, int m,cvaltype cout)
 {
   double M = 0;
-  double theta;
+  double theta,phi;
   cvaltype u_hat = 0;
-  double N = 1.0*n;
-  //cvaltype H_n = boost::math::cyl_hankel_1(0,kappa*R);
+  
   const u_int& n_dof = fem_space.n_dof();
   for(int i = 0; i<n_dof; i++){
-    int bm = fem_space.dofInfo(i).boundary_mark;
-    if(bm != 2)
-      continue;
-    const Point<DIM> point = fem_space.dofInfo(i).interp_point;
-    theta = atan2(point[1],point[0]);
-    if(theta < 0)
-      theta += 2*PI;
-    //cvaltype u_ex = u_exact(point);
-    //u_hat += u_ex*exp(-1.0*I*n*theta);
-    u_hat += cout*exp(-1.0*I*N*theta);
-    M++;
-  }
-  u_hat = u_hat/M;
+  int bm = fem_space.dofInfo(i).boundary_mark;
+  if(bm != 2)
+    continue;
+  const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+  theta = acos(point[2]/R);
+  phi = atan2(point[1],point[0]);
+  if(phi < 0)
+    phi += 2*PI;
+  cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
+  cvaltype u_ex = u_exact(point);
+  u_hat += u_ex*std::conj(Y);
+  //u_hat += cout*std::conj(Y);
+  M++;
+}
+  u_hat = 4*PI/M*u_hat;
+
   return u_hat;
 }
 
@@ -168,44 +167,47 @@ void uiExperiment::TransparentBC(int bmark)
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
-  std::cout<<fem_space.n_DGElement()<<std::endl;
-  cvaltype H,u_hat;
-  double theta;
-  for(int n=-order;n<=order;n++){
-    H = get_h(n);
-    //u_hat = get_u_hat(n,1);
-    double N = 1.0*n;
-    DGFEMSpace<double,DIM>::DGElementIterator
-      the_dgele = fem_space.beginDGElement(),
-      end_dgele = fem_space.endDGElement();
-    for (u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i) 
-      {
-	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
-	std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
-	const int& n_q_pnt = edgec.n_quad_pnt;
-	std::vector<std::vector<double> > bas_val = edgec.basis_value;
-	const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
-	int n_dgele_dof = dgele_dof.size();
+  cvaltype Theta,u_hat;
+  double theta,phi;
+  for(u_int n = 0; n <= order; n++){
+    Theta = get_Theta(n);
+    for(int m = -n; m <= n; m++){
+      u_hat = get_u_hat(n,m,1);
+      DGFEMSpace<double,DIM>::DGElementIterator
+	the_dgele = fem_space.beginDGElement(),
+	end_dgele = fem_space.endDGElement();
+      for (u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i) 
+	{
+	  EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
+	  std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+	  const int& n_q_pnt = edgec.n_quad_pnt;
+	  std::vector<std::vector<double> > bas_val = edgec.basis_value;
+	  const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
+	  int n_dgele_dof = dgele_dof.size();
 
-	for(int l=0;l<n_q_pnt;l++){
-	  double Jxw = edgec.Jxw[l];
-	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
-	  if(theta<0)
-	    theta += 2*PI;
-	  for(int j=0;j<n_dgele_dof;j++){
-	    ///////////////////
-	    //rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*o*theta)*Jxw*bas_val[j][l];
-	    //////////////////
-	    
-	    for(int k=0;k<n_dgele_dof;k++){
-	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l]*bas_val[k][l];
-	      cvaltype value = -1/R*H*get_u_hat(n,cout);
-	      triplets.push_back(T(dgele_dof[j],dgele_dof[k],value));
-	    } 
-	    
+	  for(int l=0;l<n_q_pnt;l++){
+	    double Jxw = edgec.Jxw[l];
+	    theta = acos(q_pnt[l][2]/R);
+	    phi = atan2(q_pnt[l][1],q_pnt[l][0]);
+	    if(phi < 0)
+	      phi += 2*PI;
+	  
+	    cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
+	    for(int j=0;j<n_dgele_dof;j++){
+	      ///////////////////
+	      rhs(dgele_dof[j]) += 1/R*Theta*u_hat*Y*Jxw*bas_val[j][l];
+	      //////////////////
+	      /* 
+	      for(int k=0;k<n_dgele_dof;k++){
+		cvaltype cout = Jxw*Y*bas_val[j][l]*bas_val[k][l];
+		cvaltype value = -1/R*Theta*get_u_hat(n,m,cout);
+		triplets.push_back(T(dgele_dof[j],dgele_dof[k],value));
+	      } 
+	      */
+	    }
 	  }
 	}
-      }
+    }
   }
   
   stiff_matrix.setZero();
@@ -279,19 +281,20 @@ void uiExperiment::getError()
       cvaltype a_val = a(q_pnt[l]);
       cvaltype c_val = c(q_pnt[l]); 
       cvaltype u_h_val(u_re_val[l],u_im_val[l]);
-      std::vector<cvaltype> u_h_grad(2);
+      std::vector<cvaltype> u_h_grad(3);
       u_h_grad[0] = u_re_grad[l][0]+I*u_im_grad[l][0];
       u_h_grad[1] = u_re_grad[l][1]+I*u_im_grad[l][1];
+      u_h_grad[2] = u_re_grad[l][2]+I*u_im_grad[l][2];
       cvaltype u_exact_val = u_exact(q_pnt[l]);
       cvec_type u_exact_grad = u_exact_prime(q_pnt[l]);
       
       double df_value = std::norm(u_exact_val-u_h_val);
-      double df_grad = std::norm(u_exact_grad[0]-u_h_grad[0])+std::norm(u_exact_grad[1]-u_h_grad[1]);
+      double df_grad = std::norm(u_exact_grad[0]-u_h_grad[0])+std::norm(u_exact_grad[1]-u_h_grad[1])+std::norm(u_exact_grad[2]-u_h_grad[2]);
       
       L2error += Jxw*df_value;
       L2error_grad += Jxw*df_grad;
 
-      residual += Jxw*(-c_val*(u_h_grad[0]*u_h_grad[0]+u_h_grad[1]*u_h_grad[1])+a_val*u_h_val);
+      residual += Jxw*(-c_val*(u_h_grad[0]*u_h_grad[0]+u_h_grad[1]*u_h_grad[1]+u_h_grad[2]*u_h_grad[2])+a_val*u_h_val);
     }
     ec.residual = std::abs(residual);
   }
@@ -322,7 +325,7 @@ void uiExperiment::adaptMesh()
   mesh_adaptor.convergenceOrder() = 0;
   mesh_adaptor.refineStep() = 0;
   mesh_adaptor.setIndicator(indicator);
-  mesh_adaptor.tolerence() = 0.3;
+  mesh_adaptor.tolerence() = 0.0003;
   mesh_adaptor.adapt();
 }
 void uiExperiment::getIndicator()
@@ -434,7 +437,7 @@ void uiExperiment::init()
   four_tetrahedron_unit_out_normal.readData("four_tetrahedron.out_nrm");
 
   triangle_template_geometry.readData("triangle.tmp_geo");
-  triangle_coord_transform.readData("triangle.crd_trs");
+  triangle_to3d_coord_transform.readData("triangle.to3d.crd_trs");
   
   // set template element
   template_element.resize(3);
@@ -457,7 +460,7 @@ void uiExperiment::init()
 			     four_tetrahedron_unit_out_normal);
 
   dg_template_element.resize(1);
-  dg_template_element[0].reinit(triangle_template_geometry,triangle_coord_transform);
+  dg_template_element[0].reinit(triangle_template_geometry,triangle_to3d_coord_transform);
   
   
   std::cout << "********** Initialize Complete **********" << std::endl;
@@ -487,8 +490,8 @@ void uiExperiment::buildFEMSpace()
       fem_space.element(i).reinit(fem_space,i,2);
     else
       {
-      std::cerr<<"Error: the number of vertex is wrong"<<std::endl;
-    }
+	std::cerr<<"Error: the number of vertex is wrong"<<std::endl;
+      }
   }
   fem_space.buildElement();
   fem_space.buildDof();
@@ -558,13 +561,13 @@ void uiExperiment::solve()
   getMat();
   getRhs();
   
-  NeummanBC(g,1);
+  //NeummanBC(g,1);
 
-  //TransparentBC(5,2);
+  //TransparentBC(2);
   
   DirichletBC(bnd,2);
-  //NeummanBC(g1,2);
-  //DirichletBC(bnd,1);
+  //NeummanBC(g2,2);
+  DirichletBC(bnd,1);
   Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
 
   Eigen_solver.compute(stiff_matrix);
