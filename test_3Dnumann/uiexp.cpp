@@ -22,7 +22,8 @@ void uiExperiment::getMat()
       cvaltype c_val = c(q_pnt[l]);
       for(int j = 0; j < n_ele_dof; j++){
 	for(int k = 0; k < n_ele_dof; k++){
-	  cvaltype cont = Jxw *(c_val*innerProduct(bas_grad[j][l],bas_grad[k][l])+(a_val*bas_val[j][l]*bas_val[k][l]));
+	  //cvaltype cont = Jxw *(c_val*innerProduct(bas_grad[j][l],bas_grad[k][l])+(a_val*bas_val[j][l]*bas_val[k][l]));
+	  cvaltype cont = Jxw *(c_val*(bas_grad[j][l][0]*bas_grad[k][l][0]+bas_grad[j][l][1]*bas_grad[k][l][1]+bas_grad[j][l][2]*bas_grad[k][l][2])+(a_val*bas_val[j][l]*bas_val[k][l]));
 	  triplets.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
       }
@@ -113,7 +114,6 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
 	for(int j=0;j<n_dgele_dof;j++){
 	  
 	  rhs(dgele_dof[j]) += Jxw * bas_val[j][l]*g_val;
-
 	  //  std::cout<<" rhs= " << rhs(dgele_dof[j]) << std::endl;
 	  ///////////////////
 	  if(fem_space.dofInfo(dgele_dof[j]).boundary_mark == bmark){
@@ -414,12 +414,12 @@ void uiExperiment::solve()
   getMat();
   getRhs();
   
-  NeummanBC(g,1);
+  //NeummanBC(g,1);
 
   
   DirichletBC(bnd,2);
   //NeummanBC(g2,2);
-  // DirichletBC(bnd,1);
+   DirichletBC(bnd,1);
   Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
 
   Eigen_solver.compute(stiff_matrix);
@@ -452,7 +452,7 @@ void writeMatlabData(const std::string& filename, FEMFunction<double,DIM> u_h)
 void uiExperiment::saveData()
 {
   u_re.writeOpenDXData("u_re.dx");
-  //u_im.writeOpenDXData("u_im.dx");
+  u_im.writeOpenDXData("u_im.dx");
   u_exact_re.writeOpenDXData("u_exact_re.dx");
   Error.writeOpenDXData("error.dx");
   //writeMatlabData("u_r.dat",u_re);

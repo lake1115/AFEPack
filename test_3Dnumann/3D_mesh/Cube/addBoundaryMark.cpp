@@ -104,31 +104,13 @@ int main(int argc, char* argv[])
 
     tri_geo.boundaryMark() = 0;
     std::vector<int>& vtx = tri_geo.vertex();
-    
-    if(mesh.geometry(0,vtx[0]).boundaryMark() == 1 && mesh.geometry(0,vtx[1]).boundaryMark() == 1 && mesh.geometry(0,vtx[2]).boundaryMark() == 1){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 1 && mesh.geometry(0,vtx[1]).boundaryMark() == 2 && mesh.geometry(0,vtx[2]).boundaryMark() == 2){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 2 && mesh.geometry(0,vtx[1]).boundaryMark() == 1 && mesh.geometry(0,vtx[2]).boundaryMark() == 2){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 2 && mesh.geometry(0,vtx[1]).boundaryMark() == 2 && mesh.geometry(0,vtx[2]).boundaryMark() == 1){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 2 && mesh.geometry(0,vtx[1]).boundaryMark() == 1 && mesh.geometry(0,vtx[2]).boundaryMark() == 1){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 1 && mesh.geometry(0,vtx[1]).boundaryMark() == 2 && mesh.geometry(0,vtx[2]).boundaryMark() == 1){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 1 && mesh.geometry(0,vtx[1]).boundaryMark() == 1 && mesh.geometry(0,vtx[2]).boundaryMark() == 2){
-      tri_geo.boundaryMark() = 1;
-    }
-    else if(mesh.geometry(0,vtx[0]).boundaryMark() == 2 && mesh.geometry(0,vtx[1]).boundaryMark() == 2 && mesh.geometry(0,vtx[2]).boundaryMark() == 2){
+    if(mesh.geometry(0,vtx[0]).boundaryMark() == 2 && mesh.geometry(0,vtx[1]).boundaryMark() == 2 && mesh.geometry(0,vtx[2]).boundaryMark() == 2){
       tri_geo.boundaryMark() = 2;
     }
+    else if(mesh.geometry(0,vtx[0]).boundaryMark() != 0 && mesh.geometry(0,vtx[1]).boundaryMark() != 0 && mesh.geometry(0,vtx[2]).boundaryMark() !=0){
+      tri_geo.boundaryMark() = 1;
+    }
+    
 
   }
 
@@ -140,7 +122,7 @@ int main(int argc, char* argv[])
     GeometryBM& tet_geo = mesh.geometry(3, i);
     
     tet_geo.boundaryMark() = 0;
-
+    /*
     const int& n_bnd = tet_geo.n_boundary();
     for(int j = 0;j < n_bnd;++ j){
       if(mesh.geometry(2, tet_geo.boundary()[j]).boundaryMark() == 1){
@@ -151,8 +133,8 @@ int main(int argc, char* argv[])
 	tet_geo.boundaryMark() = 2;
 	break;
       }
-
     }
+    */
   }
 
   std::cout << "boundary tetrahedron are done..." << std::endl;  

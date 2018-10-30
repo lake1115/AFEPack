@@ -129,7 +129,7 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
       }
     }
   for(int i=0;i<fem_space.n_dof();i++){
-    //std::cout<<" rhs: "<< rhs(i) << " test: " << test_rhs(i)<<std::endl;
+    std::cout<<" rhs: "<< rhs(i) << " test: " << test_rhs(i)<<std::endl;
   }
 
   stiff_matrix.setZero();
