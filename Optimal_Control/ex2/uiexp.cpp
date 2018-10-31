@@ -17,7 +17,7 @@ double uiExperiment::project_u(Point<DIM> p){
       if(onElement(pnt0,pnt1,pnt2,p))
 	return u_h.value(p,*the_ele);
     }
-  std::cerr<< " Can't find point in mesh of u! " << std::endl;
+  // std::cerr<< " Can't find point in mesh of u! " << std::endl;
 }
 
 double uiExperiment::project_y(Point<DIM> p){
@@ -37,7 +37,7 @@ double uiExperiment::project_y(Point<DIM> p){
 	return -y_h.value(p,*the_ele)*p_h.value(p,*the_ele);
       }
     }
-  std::cerr<< " Can't find point in mesh of y and p! " << std::endl;
+  //std::cerr<< " Can't find point in mesh of y and p! " << std::endl;
 }
 
 void uiExperiment::getMat_exact_y()
@@ -315,15 +315,17 @@ void uiExperiment::adaptMesh()
   mesh_adaptor.convergenceOrder() = 0;
   mesh_adaptor.refineStep() = 0;
   mesh_adaptor.setIndicator(indicator_u);
-  mesh_adaptor.tolerence() = 0.5;
+  mesh_adaptor.tolerence() = 0.0005;
   mesh_adaptor.adapt();
   // adapt y,p
+  
   mesh_adaptor.reinit(ir_mesh_y);
   mesh_adaptor.convergenceOrder() = 0;
   mesh_adaptor.refineStep() = 0;
   mesh_adaptor.setIndicator(indicator_y);
-  mesh_adaptor.tolerence() = 0.5;
+  mesh_adaptor.tolerence() = 0.001;
   mesh_adaptor.adapt();
+  
 }
 void uiExperiment::getIndicator()
 {
@@ -334,11 +336,11 @@ void uiExperiment::getIndicator()
   indicator_u.reinit(mesh_u);
   // eta_u for mesh of u
   int n_element_u = mesh_u.n_geometry(DIM);
-  double eta_1 = 0.0;
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_u.beginElement(),
     end_ele = fem_space_u.endElement();
   for(int i=0;the_ele!=end_ele;++the_ele,++i){
+    double eta_1 = 0.0;
     GeometryBM& geo =the_ele->geometry();
     std::vector<int>& vtx = geo.vertex();
     Point<DIM>& p0 = mesh_u.point(vtx[0]); 
@@ -353,14 +355,11 @@ void uiExperiment::getIndicator()
       eta_1 += h_u*h_u*du*du;
     }
     indicator_u[i] = sqrt(eta_1);
+    //std::cout<<" indicator_u "<<" i "<<i <<" "<<indicator_u[i]<<std::endl;
   }
 
   // eta_p and eta_y for mesh of p and y
   int n_element_y = mesh_y.n_geometry(DIM);
-  double eta_2 = 0.0;
-  double eta_4 = 0.0;
-  double eta_3 = 0.0;
-  double eta_5 = 0.0;
 
   // jump of p and y 
   int n_face = mesh_y.n_geometry(DIM - 1);
@@ -388,6 +387,11 @@ void uiExperiment::getIndicator()
   the_ele = fem_space_y.beginElement(),
   end_ele = fem_space_y.endElement();
   for(int i=0;the_ele!=end_ele;++the_ele,++i){
+    double eta_2 = 0.0;
+    double eta_4 = 0.0;
+    double eta_3 = 0.0;
+    double eta_5 = 0.0;
+
     GeometryBM& geo =the_ele->geometry();
     const int& ele_idx = the_ele->index();
     ElementCache<double,DIM>& ec = element_cache_y[ele_idx];        
@@ -416,6 +420,7 @@ void uiExperiment::getIndicator()
     }
     indicator_y[i] = sqrt(eta_2+eta_4+eta_3+eta_5);
  
+    //std::cout<<" indicator_y "<<" i "<<i <<" "<<indicator_y[i]<<std::endl;
   } 
  
 }
@@ -617,11 +622,12 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   int n_side = mesh.n_geometry(DIM-1);
   int n_dg_ele = 0;
   for(int i=0;i<n_side;i++){
-    // begin from mark 11  
+    // begin from mark 11
+    std::cout<<"bmark: " << mesh.geometry(DIM-1,i).boundaryMark()<<std::endl;
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
       n_dg_ele +=1;
   }
-
+  std::cout<<" n_side " <<n_side<<" n_dg_ele  "<<n_dg_ele<<std::endl;
   // build DGElement
   fem_space_y.dgElement().resize(n_dg_ele);
   for(int i=0,j=0;i<n_side;i++){
@@ -666,7 +672,7 @@ void uiExperiment::solve()
   
   // y_exact.writeOpenDXData("y_exact.dx");
   double error;
-  double rho = 0.1;
+  double rho = 0.5;
   double tolerence = 1.0e-5;
   do{
     //backup old u
