@@ -32,7 +32,7 @@
  *       1
  *****************************************************************************
  */
-#define example 0
+#define example 1
 #if example
 
 
@@ -60,11 +60,11 @@ cvaltype f(const double *p){
 }
 
 double y_0(const double *p){
-  return 0.1;
+  return 0.0;
 }
 
 cvaltype bnd(const double *p){
-  return 0;
+  return 0.0;
 }
 #else
 void setA(Eigen::Matrix2d& A,const double *p){

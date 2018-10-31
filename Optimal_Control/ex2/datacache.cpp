@@ -7,11 +7,25 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
 			       u_int alg_acc, 
 			       ElementCache<value_type,DIM>& ec)
 {
-  //FEMSpace<value_type,DIM>& sp = ele.femSpace();
-  //Mesh<DIM>& mesh = sp.mesh();
-  //GeometryBM& geo = ele.geometry();
-  //barycenter(mesh,geo,ec.bc);	// calculate center point positions
+  FEMSpace<value_type,DIM>& sp = ele.femSpace();
+  Mesh<DIM>& mesh = sp.mesh();
+  GeometryBM& geo = ele.geometry();
+  u_int n_bnd = geo.n_boundary();
+  barycenter(mesh,geo,ec.bc);	// calculate center point positions
   
+  ec.bnd_mid_pnt_list.resize(n_bnd);
+  ec.bnd_un_list.resize(n_bnd);
+  ec.bnd_length_list.resize(n_bnd);
+  for(u_int i=0; i<n_bnd; ++i){
+    GeometryBM& bnd = mesh.geometry(DIM-1, geo.boundary(i));
+    Point<DIM>& p0 = mesh.point(bnd.vertex(0));
+    Point<DIM>& p1 = mesh.point(bnd.vertex(1));
+    double& length = ec.bnd_length_list[i];
+    length = sqrt((p1[1]-p0[1])*(p1[1]-p0[1])+(p1[0]-p0[0])*(p1[0]-p0[0]));
+    ec.bnd_mid_pnt_list[i] = midpoint(p0,p1);
+    ec.bnd_un_list[i] = ele.unitOutNormal(midpoint(p0,p1),i);
+  }
+
   double volume = ele.templateElement().volume(); 
   const QuadratureInfo<DIM>& quad_info = ele.findQuadratureInfo(alg_acc); 
   int& n_quad_pnt = ec.n_quad_pnt; 
@@ -27,8 +41,10 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
     Jxw = volume*jacobian[l]*quad_info.weight(l);
     ec.volume += Jxw;
   }
+  double& d = ec.diameter;
+  d =  (ec.bnd_length_list[0]*ec.bnd_length_list[1]*ec.bnd_length_list[2])/2.0/ec.volume;
+
 }
-/*
 template <class value_type, int DIM, int DOW=DIM,int TDIM=DIM>
 void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge, 
 			    u_int alg_acc, 
@@ -58,7 +74,6 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
     ec.volume += Jxw;
   }
 }
-*/
 void uiExperiment::updateGeometryCache(DGFEMSpace<double,DIM>& fem_space,std::vector<ElementCache<double,DIM> >& element_cache,u_int alg_acc)
 {
   u_int n_ele = fem_space.n_element();
@@ -77,8 +92,7 @@ void uiExperiment::updateGeometryCache(DGFEMSpace<double,DIM>& fem_space,std::ve
     ec.basis_gradient = ele.basis_function_gradient(ec.q_pnt);
   }
 }
-/*
-void uiExperiment::updateDGGeometryCache(DGFEMSpace<double,DIM> fem_space,std::vector<EdgeCache<double,DIM> >& edge_cache ,u_int alg_acc)
+void uiExperiment::updateDGGeometryCache(DGFEMSpace<double,DIM>& fem_space,std::vector<EdgeCache<double,DIM> >& edge_cache ,u_int alg_acc)
 {
   u_int n_edge = fem_space.n_DGElement();
   edge_cache.clear();
@@ -98,10 +112,11 @@ void uiExperiment::updateDGGeometryCache(DGFEMSpace<double,DIM> fem_space,std::v
     ec.basis_gradient = p_neigh->basis_function_gradient(ec.q_pnt);
     ec.p_neigh = p_neigh;
     p_neigh = edge.p_neighbourElement(1);
-    if (p_neigh != NULL) {
-     std::cerr<<"Error: edge elements only have one neighbourelement"<<std::endl;
-    }
+    ec.p_neigh2 = p_neigh;
+
+    //if (p_neigh != NULL) {
+    // std::cerr<<"Error: edge elements only have one neighbourelement"<<std::endl;
+    //}
   }
 }
 
-*/

@@ -34,7 +34,7 @@ double uiExperiment::project_y(Point<DIM> p){
       Point<DIM>& pnt2 = mesh_y.point(vtx[2]); 
       if(onElement(pnt0,pnt1,pnt2,p)){
 	
-	return p_h.value(p,*the_ele);
+	return -y_h.value(p,*the_ele)*p_h.value(p,*the_ele);
       }
     }
   std::cerr<< " Can't find point in mesh of y and p! " << std::endl;
@@ -63,9 +63,8 @@ void uiExperiment::getMat_exact_y()
 	  std::vector<double> A_grad_y(2);
 	  A_grad_y[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_y[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  cvaltype u_val = 0.0;
-	  //cvaltype u_val = u_exact(q_pnt[l]);
-	  cvaltype cont = Jxw * (innerProduct(bas_grad[j][l],bas_grad[k][l]));
+	  cvaltype u_val = u_exact(q_pnt[l]);
+	  cvaltype cont = Jxw * (innerProduct(A_grad_y,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_y.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
       }
@@ -91,9 +90,8 @@ void uiExperiment::getRhs_exact_y()
     for (int l = 0;l < n_q_pnt;l ++) {
       double Jxw = ec.Jxw[l];
       cvaltype f_val = f(q_pnt[l]);
-      cvaltype u_val = u_exact(q_pnt[l]);
       for (int j = 0;j < n_ele_dof;j ++) {
-	cvaltype cout = Jxw * bas_val[j][l] *( f_val+u_val); 
+	cvaltype cout = Jxw * bas_val[j][l] *f_val; 
 	rhs_y(ele_dof[j]) += cout;
       }
     }
@@ -124,8 +122,7 @@ void uiExperiment::getMat_y()
 	  std::vector<double> A_grad_y(2);
 	  A_grad_y[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_y[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  double u_val = 0.0;
-	  //double u_val = project_u(q_pnt[l]);
+	  double u_val = project_u(q_pnt[l]);
 	  cvaltype cont = Jxw *(innerProduct(A_grad_y,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_y.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
@@ -160,8 +157,7 @@ void uiExperiment::getMat_p()
 	  std::vector<double> A_grad_p(2);
 	  A_grad_p[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_p[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  double u_val = 0.0;
-	  // double u_val = project_u(q_pnt[l]);
+	  double u_val = project_u(q_pnt[l]);
 	  cvaltype cont = Jxw *(innerProduct(A_grad_p,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_p.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
@@ -188,10 +184,8 @@ void uiExperiment::getRhs_y()
     for (int l = 0;l < n_q_pnt;l ++) {
       double Jxw = ec.Jxw[l];
       cvaltype f_val = f(q_pnt[l]);
-      double u_val = project_u(q_pnt[l]);
       for (int j = 0;j < n_ele_dof;j ++) {
-	cvaltype cout = Jxw * bas_val[j][l] *( f_val+u_val); 
-        //std::cout<<" c " << cout << std::endl;
+	cvaltype cout = Jxw * bas_val[j][l] *f_val; 
 	rhs_y(ele_dof[j]) += cout;
       }
     }
@@ -215,8 +209,7 @@ void uiExperiment::getRhs_p()
     for (int l = 0;l < n_q_pnt;l ++) {
       double Jxw = ec.Jxw[l];
       double y_val = y_h.value(q_pnt[l],*the_ele);
-      double y0_val = y_0(q_pnt[l]);
-      //double y0_val = y_exact.value(q_pnt[l],*the_ele);
+      double y0_val = y_exact.value(q_pnt[l],*the_ele);
       for (int j = 0;j < n_ele_dof;j ++) {
 	cvaltype cout = Jxw * bas_val[j][l] * (y_val - y0_val); 
 	rhs_p(ele_dof[j]) += cout;
@@ -305,8 +298,8 @@ void uiExperiment::getError()
     for (int l = 0; l < n_q_pnt; l++){
       double Jxw = ec.Jxw[l];
       double y_h_val = y_h.value(q_pnt[l],*the_ele);
-      double y_exact_val = Y_exact(q_pnt[l]);
-      //double y_exact_val = y_exact.value(q_pnt[l],*the_ele);
+      //double y_exact_val = Y_exact(q_pnt[l]);
+      double y_exact_val = y_exact.value(q_pnt[l],*the_ele);
       double df_value = std::norm(y_exact_val-y_h_val);
       L2error += Jxw*df_value;
     }
@@ -314,86 +307,125 @@ void uiExperiment::getError()
   L2error = sqrt(L2error);
   std::cout << "\nL2 error = " << L2error << std::endl;
 }
-/*
-  void uiExperiment::adaptMesh()
-  {
+void uiExperiment::adaptMesh()
+{
   std::cout<<"********** Begin Adapt Mesh **********"<<std::endl;
-  mesh_adaptor.reinit(ir_mesh);
+  // adapt u
+  mesh_adaptor.reinit(ir_mesh_u);
   mesh_adaptor.convergenceOrder() = 0;
   mesh_adaptor.refineStep() = 0;
-  mesh_adaptor.setIndicator(indicator);
+  mesh_adaptor.setIndicator(indicator_u);
   mesh_adaptor.tolerence() = 0.5;
   mesh_adaptor.adapt();
-  }
-  void uiExperiment::getIndicator()
-  {
+  // adapt y,p
+  mesh_adaptor.reinit(ir_mesh_y);
+  mesh_adaptor.convergenceOrder() = 0;
+  mesh_adaptor.refineStep() = 0;
+  mesh_adaptor.setIndicator(indicator_y);
+  mesh_adaptor.tolerence() = 0.5;
+  mesh_adaptor.adapt();
+}
+void uiExperiment::getIndicator()
+{
   
-  RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
-  indicator.reinit(mesh);
-  #if 1
+  RegularMesh<DIM>& mesh_y = ir_mesh_y.regularMesh();
+  RegularMesh<DIM>& mesh_u = ir_mesh_u.regularMesh();
+  indicator_y.reinit(mesh_y);
+  indicator_u.reinit(mesh_u);
+  // eta_u for mesh of u
+  int n_element_u = mesh_u.n_geometry(DIM);
+  double eta_1 = 0.0;
   FEMSpace<double,DIM>::ElementIterator
-  the_ele = fem_space.beginElement(),
-  end_ele = fem_space.endElement();
-  for(;the_ele!=end_ele;++the_ele){
-  const std::vector<int>& ele_dof = the_ele->dof();
-  const int& n_dof = ele_dof.size();
-  const int& ele_idx = the_ele->index();
-  for(int i = 0;i<n_dof;++i){
-  Point<DIM> p = fem_space.dofInfo(i).interp_point;
-  double norm = sqrt(u_re(ele_dof[i])*u_re(ele_dof[i])+u_im(ele_dof[i])*u_im(ele_dof[i]));
-  indicator[ele_idx] += 1./sqrt(1.+pow(norm,2.0));
-  }
+    the_ele = fem_space_u.beginElement(),
+    end_ele = fem_space_u.endElement();
+  for(int i=0;the_ele!=end_ele;++the_ele,++i){
+    GeometryBM& geo =the_ele->geometry();
+    std::vector<int>& vtx = geo.vertex();
+    Point<DIM>& p0 = mesh_u.point(vtx[0]); 
+    Point<DIM>& p1 = mesh_u.point(vtx[1]); 
+    Point<DIM>& p2 = mesh_u.point(vtx[2]);
+    double h_u = getDiameter(p0,p1,p2);
+    const std::vector<int>& ele_dof = the_ele->dof();
+    const int& n_ele_dof = ele_dof.size();
+    for(int i=0;i<n_ele_dof;i++){
+      const Point<DIM>& point = fem_space_u.dofInfo(ele_dof[i]).interp_point;
+      double du = u_h(ele_dof[i])+project_y(point);
+      eta_1 += h_u*h_u*du*du;
+    }
+    indicator_u[i] = sqrt(eta_1);
   }
 
-  #else
-  int n_face = mesh.n_geometry(DIM - 1);
-  std::vector<bool> flag(n_face,false);
-  std::vector<double> jump(n_face);
-  FEMSpace<double,DIM>::ElementIterator
-  the_ele = fem_space.beginElement(),
-  end_ele = fem_space.endElement();
-  for(;the_ele!=end_ele; ++ the_ele)
-  {
-  GeometryBM& geo = the_ele->geometry();
-  for(int j=0; j<geo.n_boundary(); ++j)
-  {
-  GeometryBM& bnd = mesh.geometry(DIM-1, geo.boundary(j));
-  AFEPack::Point<DIM>& p0 = mesh.point(bnd.vertex(0));
-  AFEPack::Point<DIM>& p1 = mesh.point(bnd.vertex(1));
-  std::vector<double> u_h_grad = u_re.gradient(midpoint(p0,p1), *the_ele);
-  double a = (u_h_grad[0]*(p0[1]-p1[1])+u_h_grad[1]*(p1[0]-p0[0]));
-  if(flag[bnd.index()] == false)
-  {
-  jump[bnd.index()] = a;
-  flag[bnd.index()] = true;
+  // eta_p and eta_y for mesh of p and y
+  int n_element_y = mesh_y.n_geometry(DIM);
+  double eta_2 = 0.0;
+  double eta_4 = 0.0;
+  double eta_3 = 0.0;
+  double eta_5 = 0.0;
+
+  // jump of p and y 
+  int n_face = mesh_y.n_geometry(DIM - 1);
+  std::vector<double> jump_p(n_face,0);
+  std::vector<double> jump_y(n_face,0);
+  
+  for(u_int k=0;k<edge_cache[0].size();k++){
+    EdgeCache<double,DIM>& edgec = edge_cache[0][k];
+    std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+    Element<double,DIM>* ele1 = edgec.p_neigh;
+    Element<double,DIM>* ele2 = edgec.p_neigh2;
+    const int& n_q_pnt = edgec.n_quad_pnt;
+    for(u_int l=0;l<n_q_pnt;l++){
+      double Jxw = edgec.Jxw[l];
+      std::vector<double> p_h_grad = p_h.gradient(q_pnt[l], *ele1);
+      std::vector<double> p_h_grad2 = p_h.gradient(q_pnt[l], *ele2);
+      std::vector<double> y_h_grad = y_h.gradient(q_pnt[l], *ele1);
+      std::vector<double> y_h_grad2 = y_h.gradient(q_pnt[l], *ele2);
+      
+      jump_p[edgec.idx] += Jxw*std::norm(((p_h_grad[0]*edgec.un[l][0]+p_h_grad[1]*edgec.un[l][1])-(p_h_grad2[0]*edgec.un[l][0]+p_h_grad2[1]*edgec.un[l][1])));
+      jump_y[edgec.idx] += Jxw*std::norm(((y_h_grad[0]*edgec.un[l][0]+y_h_grad[1]*edgec.un[l][1])-(y_h_grad2[0]*edgec.un[l][0]+y_h_grad2[1]*edgec.un[l][1])));
+    }
   }
-  else
-  {
-  jump[bnd.index()] -= a;
-  flag[bnd.index()] = false;
-  }
-  }
-  }
-  the_ele = fem_space.beginElement();
-  for(int i=0; the_ele!= end_ele; ++ the_ele, ++i)
-  {
-  GeometryBM& geo = the_ele->geometry();
-  indicator[i] = 0.0;
-  for(int j=0; j<geo.n_boundary(); ++j)
-  {
-  GeometryBM& bnd = mesh.geometry(DIM-1,geo.boundary(j));
-  if(flag[bnd.index()])
-  continue;
-  indicator[i] += jump[bnd.index()]*jump[bnd.index()];
-  }
-  }
-  #endif
-  }
-*/
+   
+  the_ele = fem_space_y.beginElement(),
+  end_ele = fem_space_y.endElement();
+  for(int i=0;the_ele!=end_ele;++the_ele,++i){
+    GeometryBM& geo =the_ele->geometry();
+    const int& ele_idx = the_ele->index();
+    ElementCache<double,DIM>& ec = element_cache_y[ele_idx];        
+    std::vector<Point<DIM> >& q_pnt = ec.q_pnt;
+    const int& n_q_pnt = ec.n_quad_pnt;
+    for(int l=0;l<n_q_pnt;l++){
+      double Jxw = ec.Jxw[l];
+      double y_h_val = y_h.value(q_pnt[l],*the_ele);
+      double y_exact_val = y_exact.value(q_pnt[l],*the_ele);
+      std::vector<double> y_h_grad = y_h.gradient(q_pnt[l],*the_ele);
+      std::vector<double> p_h_grad = p_h.gradient(q_pnt[l],*the_ele);
+      cvaltype f_val = f(q_pnt[l]);
+	
+      double dp = std::norm(y_h_val-y_exact_val+p_h_grad[0]*p_h_grad[0]+p_h_grad[1]*p_h_grad[1]);
+      double dy = std::norm(f_val+y_h_grad[0]*y_h_grad[0]+y_h_grad[1]*y_h_grad[1]);
+
+      eta_2 += Jxw*ec.diameter*ec.diameter*dp;
+      eta_4 += Jxw*ec.diameter*ec.diameter*dy;
+    } 
+    
+  
+    for(int j=0; j<geo.n_boundary(); ++j){
+	GeometryBM& bnd = mesh_y.geometry(DIM-1,geo.boundary(j));
+	eta_3 += ec.bnd_length_list[j]*jump_p[bnd.index()];
+	eta_5 += ec.bnd_length_list[j]*jump_y[bnd.index()];
+    }
+    indicator_y[i] = sqrt(eta_2+eta_4+eta_3+eta_5);
+ 
+  } 
+ 
+}
 // read mesh file
 uiExperiment::uiExperiment(const std::string& file)
 {
   mesh_file = file;
+  n_bmark = 1;
+  bmark_count = 0;
+  
 };
 
 uiExperiment::~uiExperiment()
@@ -555,58 +587,59 @@ void uiExperiment::buildFEMSpace()
     const Point<DIM>& point = fem_space_u.dofInfo(i).interp_point;
     u_h(i) = u_0(point);
   }
-  for(int i=0;i<fem_space_y.n_dof();i++){
+  /*
+    for(int i=0;i<fem_space_y.n_dof();i++){
     const Point<DIM>& point = fem_space_y.dofInfo(i).interp_point;
     y_exact(i) = Y_exact(point);
-  }
-
+    }
+  */
   
   // for record Neumman bc bmark
-  //edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
+  edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
+  buildDGFEMSpace(0);
 }
-/*
-  void uiExperiment::buildDGFEMSpace(int bmark)
-  {
+void uiExperiment::buildDGFEMSpace(int bmark)
+{
   //find bmark
   std::vector<int>::iterator ret;
   ret = std::find(bmark_list.begin(),bmark_list.end(),bmark);
   if(ret == bmark_list.end()){
-  bmark_count = bmark_list.size();
-  bmark_list.push_back(bmark);
+    bmark_count = bmark_list.size();
+    bmark_list.push_back(bmark);
   }
   else{
-  int pos = ret - bmark_list.begin();
-  bmark_count = pos;
+    int pos = ret - bmark_list.begin();
+    bmark_count = pos;
   }
 
-  Mesh<DIM,DIM>& mesh = fem_space.mesh();
+  Mesh<DIM,DIM>& mesh = fem_space_y.mesh();
   // calculate Neumann boundary number
   int n_side = mesh.n_geometry(DIM-1);
   int n_dg_ele = 0;
   for(int i=0;i<n_side;i++){
-  // begin from mark 11  
-  if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
-  n_dg_ele +=1;
+    // begin from mark 11  
+    if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
+      n_dg_ele +=1;
   }
 
   // build DGElement
-  fem_space.dgElement().resize(n_dg_ele);
+  fem_space_y.dgElement().resize(n_dg_ele);
   for(int i=0,j=0;i<n_side;i++){
-  if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
-  fem_space.dgElement(j).reinit(fem_space,i,0);
-  j += 1;
+    if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
+      fem_space_y.dgElement(j).reinit(fem_space_y,i,0);
+      j += 1;
+    }
   }
-  }
-  fem_space.buildDGElement();
+  fem_space_y.buildDGElement();
   
   std::cout << "Update DG Data Cache ...";
-  std::cout << " bmark: "<<bmark<<" ...";
+  std::cout << " bmark: "<<bmark<<" ..."<< " side: "<< n_dg_ele<<" ...";
   if(bmark_count == n_bmark)
-  std::cerr<<"Error: not enough bmark number"<<std::endl;
-  updateDGGeometryCache(edge_cache[bmark_count],3);
+    std::cerr<<"Error: not enough bmark number"<<std::endl;
+  updateDGGeometryCache(fem_space_y,edge_cache[bmark_count],3);
   std::cout << "OK!" << std::endl;
-  }
-*/
+}
+
 void uiExperiment::get_exact_y(){
   getMat_exact_y();
   getRhs_exact_y();
@@ -629,7 +662,7 @@ void uiExperiment::get_exact_y(){
 
 void uiExperiment::solve()
 {
-  // get_exact_y();
+  get_exact_y();
   
   // y_exact.writeOpenDXData("y_exact.dx");
   double error;
@@ -671,11 +704,11 @@ void uiExperiment::solve()
       const Point<DIM>& point = fem_space_u.dofInfo(i).interp_point;
       double du = project_y(point);
       // std::cout<<" du is "<<du<<std::endl;
-      u_h(i) = old_u_h(i) - rho*(old_u_h(i)-u_0(point)+du);
+      u_h(i) = old_u_h(i) - rho*(old_u_h(i)+du);
       u_h(i) = std::max(u_h(i),0.0);
     }
     // Forth: calculate error
-    getError();
+    //getError();
     old_u_h.add(-1,u_h);
     error = Functional::L2Norm(old_u_h,3);
     std::cout<<" error_u = " << error << std::endl;
@@ -720,8 +753,8 @@ void uiExperiment::run()
     saveData();
     //getError();
 
-    //getIndicator();
-    //adaptMesh();
+    getIndicator();
+    adaptMesh();
       
     getchar();
   }while(1);

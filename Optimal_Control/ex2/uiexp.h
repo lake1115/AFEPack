@@ -82,7 +82,7 @@ public:
  DGFEMSpace<double,DIM> fem_space_u; /// FE space for u 
 
  std::vector<ElementCache<double,DIM> > element_cache_y;
- //std::vector<ElementCache<double,DIM> > element_cache_u;
+ std::vector<ElementCache<double,DIM> > element_cache_u;
  std::vector<EdgeCache<double,DIM> >* edge_cache;
 
  FEMFunction<double,DIM> y_h;    
@@ -112,9 +112,9 @@ public:
 
  Eigen::Matrix2d A;
  
- // u_int n_bmark = 4;
- //u_int bmark_count = 0;
- //std::vector<int> bmark_list;
+ u_int n_bmark;
+ u_int bmark_count;
+ std::vector<int> bmark_list;
  
  public:
  uiExperiment(const std::string& file);
@@ -126,7 +126,7 @@ public:
  void buildFEMSpace();
  void buildDGFEMSpace(int bmark=11);
  void updateGeometryCache(DGFEMSpace<double,DIM>& fem_space,std::vector<ElementCache<double,DIM> >& element_cache,u_int alg_acc=3);
- void updateDGGeometryCache(std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc=3);
+ void updateDGGeometryCache(DGFEMSpace<double,DIM>& fem_space,std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc=3);
  void DirichletBC(Eigen::SparseMatrix<cvaltype,Eigen::RowMajor>& stiff_matrix,Eigen::Matrix<cvaltype,Eigen::Dynamic,1>& rhs,CFunc bnd,int bmark=1);
  void NeummanBC(CFunc g,int bmark=11);
  void getRhs_y();
@@ -170,5 +170,15 @@ bool onElement(Point<DIM> pntA,Point<DIM> pntB,Point<DIM> pntC,Point<DIM> pntP){
     return false;
   return u + v <= 1;
 };
+
+inline
+double getDiameter(Point<DIM> p0,Point<DIM> p1,Point<DIM> p2){
   
+  double l1 = sqrt((p1[1]-p0[1])*(p1[1]-p0[1])+(p1[0]-p0[0])*(p1[0]-p0[0]));
+  double l2 = sqrt((p2[1]-p1[1])*(p2[1]-p1[1])+(p2[0]-p1[0])*(p2[0]-p1[0]));
+  double l3 = sqrt((p0[1]-p2[1])*(p0[1]-p2[1])+(p0[0]-p2[0])*(p0[0]-p2[0]));
+  double p = (l1+l2+l3)/2;
+  return l1*l2*l3/(2*p*(p-l1)*(p-l2)*(p-l3));
+}
+
 #endif 
