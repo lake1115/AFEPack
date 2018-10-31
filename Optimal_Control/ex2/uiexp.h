@@ -90,6 +90,9 @@ public:
  FEMFunction<double,DIM> u_h;    
 
  FEMFunction<double,DIM> y_exact;
+ FEMFunction<double,DIM> u_exact;
+
+ FEMFunction<double,DIM> u_error;
  
  Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> stiff_matrix_y;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> solution_y;

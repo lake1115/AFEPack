@@ -36,9 +36,9 @@
 #if example
 
 
-cvaltype u_exact(const double *p){
+double U_exact(const double *p){
   double Z = sin(PI*p[0])*sin(PI*p[1]);
-  cvaltype val = std::max(-Z,0.0);
+  double val = std::max(-Z,0.0);
   return val;
 }
 

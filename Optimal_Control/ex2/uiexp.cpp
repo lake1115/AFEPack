@@ -63,7 +63,7 @@ void uiExperiment::getMat_exact_y()
 	  std::vector<double> A_grad_y(2);
 	  A_grad_y[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_y[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  cvaltype u_val = u_exact(q_pnt[l]);
+	  double u_val = U_exact(q_pnt[l]);
 	  cvaltype cont = Jxw * (innerProduct(A_grad_y,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_y.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
@@ -285,7 +285,15 @@ void uiExperiment::DirichletBC(Eigen::SparseMatrix<cvaltype,Eigen::RowMajor>& st
 void uiExperiment::getError()
 {  
   double L2error = 0;
+  u_int& n_dof = fem_space_u.n_dof();
+  for(int i=0;i<n_dof;i++){
+    L2error += std::norm(u_exact(i) - u_h(i)); 
+  }
+  L2error = sqrt(L2error);
+  std::cout << "\nL2 error = " << L2error << std::endl;
 
+  
+  /*
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -306,6 +314,7 @@ void uiExperiment::getError()
   }
   L2error = sqrt(L2error);
   std::cout << "\nL2 error = " << L2error << std::endl;
+  */
 }
 void uiExperiment::adaptMesh()
 {
@@ -571,6 +580,7 @@ void uiExperiment::buildFEMSpace()
   u_h.reinit(fem_space_u);
 
   y_exact.reinit(fem_space_y);
+  u_exact.reinit(fem_space_u);
   
   const int& n_dof = fem_space_y.n_dof();
   stiff_matrix_y.resize(n_dof,n_dof);
@@ -591,6 +601,7 @@ void uiExperiment::buildFEMSpace()
   for(int i=0;i<fem_space_u.n_dof();i++){
     const Point<DIM>& point = fem_space_u.dofInfo(i).interp_point;
     u_h(i) = u_0(point);
+    u_exact(i) = U_exact(point);
   }
   /*
     for(int i=0;i<fem_space_y.n_dof();i++){
@@ -623,15 +634,15 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   int n_dg_ele = 0;
   for(int i=0;i<n_side;i++){
     // begin from mark 11
-    std::cout<<"bmark: " << mesh.geometry(DIM-1,i).boundaryMark()<<std::endl;
-    if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
+    //std::cout<<"bmark: " << mesh.geometry(DIM-1,i).boundaryMark()<<std::endl;
+    if(mesh.geometry(DIM-1,i).boundaryMark() <= bmark)
       n_dg_ele +=1;
   }
-  std::cout<<" n_side " <<n_side<<" n_dg_ele  "<<n_dg_ele<<std::endl;
+  //std::cout<<" n_side " <<n_side<<" n_dg_ele  "<<n_dg_ele<<std::endl;
   // build DGElement
   fem_space_y.dgElement().resize(n_dg_ele);
   for(int i=0,j=0;i<n_side;i++){
-    if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
+    if(mesh.geometry(DIM-1,i).boundaryMark() <= bmark){
       fem_space_y.dgElement(j).reinit(fem_space_y,i,0);
       j += 1;
     }
@@ -673,6 +684,7 @@ void uiExperiment::solve()
   // y_exact.writeOpenDXData("y_exact.dx");
   double error;
   double rho = 0.5;
+  double alpha = 0.1;
   double tolerence = 1.0e-5;
   do{
     //backup old u
@@ -710,14 +722,14 @@ void uiExperiment::solve()
       const Point<DIM>& point = fem_space_u.dofInfo(i).interp_point;
       double du = project_y(point);
       // std::cout<<" du is "<<du<<std::endl;
-      u_h(i) = old_u_h(i) - rho*(old_u_h(i)+du);
+      u_h(i) = old_u_h(i) - rho*(alpha*old_u_h(i)+du);
       u_h(i) = std::max(u_h(i),0.0);
     }
     // Forth: calculate error
     //getError();
     old_u_h.add(-1,u_h);
     error = Functional::L2Norm(old_u_h,3);
-    std::cout<<" error_u = " << error << std::endl;
+    std::cout<<" du = " << error << std::endl;
     //getchar();
   }while(error>tolerence);
   
@@ -744,6 +756,7 @@ void uiExperiment::saveData()
   u_h.writeOpenDXData("u_h.dx");
   y_h.writeOpenDXData("y_h.dx");
   y_exact.writeOpenDXData("y_exact.dx");
+  u_exact.writeOpenDXData("u_exact.dx");
   p_h.writeOpenDXData("p_h.dx");
   // writeMatlabData("u_r.dat",u_re);
   //writeMatlabData("u_i.dat",u_im);
@@ -757,7 +770,7 @@ void uiExperiment::run()
     buildFEMSpace();
     solve();
     saveData();
-    //getError();
+    getError();
 
     getIndicator();
     adaptMesh();
