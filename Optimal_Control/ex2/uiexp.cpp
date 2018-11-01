@@ -1,7 +1,6 @@
 #include "uiexp.h"
 #include "parameter.h"
 
-
 double uiExperiment::project_u(Point<DIM> p){
   Mesh<DIM>& mesh_u = fem_space_u.mesh();
   FEMSpace<double,DIM>::ElementIterator
@@ -14,10 +13,11 @@ double uiExperiment::project_u(Point<DIM> p){
       Point<DIM>& pnt0 = mesh_u.point(vtx[0]); 
       Point<DIM>& pnt1 = mesh_u.point(vtx[1]); 
       Point<DIM>& pnt2 = mesh_u.point(vtx[2]); 
-      if(onElement(pnt0,pnt1,pnt2,p))
+      if(onElement(pnt0,pnt1,pnt2,p)){
 	return u_h.value(p,*the_ele);
+      }	
     }
-  // std::cerr<< " Can't find point in mesh of u! " << std::endl;
+  std::cerr<< " Can't find point in mesh of u! " << std::endl;
 }
 
 double uiExperiment::project_y(Point<DIM> p){
@@ -33,16 +33,52 @@ double uiExperiment::project_y(Point<DIM> p){
       Point<DIM>& pnt1 = mesh_y.point(vtx[1]); 
       Point<DIM>& pnt2 = mesh_y.point(vtx[2]); 
       if(onElement(pnt0,pnt1,pnt2,p)){
-	
 	return -y_h.value(p,*the_ele)*p_h.value(p,*the_ele);
       }
     }
-  //std::cerr<< " Can't find point in mesh of y and p! " << std::endl;
+  std::cerr<< " Can't find point in mesh of y and p! " << std::endl;
+}
+void uiExperiment::getMat_error_y()
+{
+  stiff_matrix_y.setZero();
+  triplets_y.clear();
+  
+  FEMSpace<double,DIM>::ElementIterator
+    the_ele = fem_space_y.beginElement(),
+    end_ele = fem_space_y.endElement();
+  for (;the_ele != end_ele; ++ the_ele){
+    const std::vector<int>& ele_dof = the_ele->dof();
+    const int& n_ele_dof = ele_dof.size();
+    const int& ele_idx = the_ele->index();
+    ElementCache<double,DIM>& ec = element_cache_y[ele_idx];
+    std::vector<Point<DIM> >& q_pnt = ec.q_pnt;
+    const int& n_q_pnt = ec.n_quad_pnt;
+    std::vector<std::vector<double> >& bas_val = ec.basis_value;
+    std::vector<std::vector<std::vector<double> > >& bas_grad = ec.basis_gradient; 
+    for(int l = 0; l < n_q_pnt; l++){
+      double Jxw = ec.Jxw[l];
+      setA(A,q_pnt[l]);
+      for(int j = 0; j < n_ele_dof; j++){
+	for(int k = 0; k < n_ele_dof; k++){
+	  std::vector<double> A_grad_y(2);
+	  A_grad_y[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
+	  A_grad_y[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
+	  double u_val = u_h.value(q_pnt[l],*the_ele);
+	  cvaltype cont = Jxw * (innerProduct(A_grad_y,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
+	  triplets_y.push_back(T(ele_dof[j],ele_dof[k],cont));
+	}
+      }
+      
+    }
+  }
+  stiff_matrix_y.setFromTriplets(triplets_y.begin(),triplets_y.end());
 }
 
 void uiExperiment::getMat_exact_y()
 {
   stiff_matrix_y.setZero();
+  triplets_y.clear();
+
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -76,6 +112,7 @@ void uiExperiment::getMat_exact_y()
 
 void uiExperiment::getRhs_exact_y()
 {
+  rhs_y.setZero();
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -102,6 +139,8 @@ void uiExperiment::getRhs_exact_y()
 void uiExperiment::getMat_y()
 {
   stiff_matrix_y.setZero();
+  triplets_y.clear();
+
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -117,12 +156,12 @@ void uiExperiment::getMat_y()
     for(int l = 0; l < n_q_pnt; l++){
       double Jxw = ec.Jxw[l];
       setA(A,q_pnt[l]);
+      double u_val = project_u(q_pnt[l]);
       for(int j = 0; j < n_ele_dof; j++){
 	for(int k = 0; k < n_ele_dof; k++){
 	  std::vector<double> A_grad_y(2);
 	  A_grad_y[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_y[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  double u_val = project_u(q_pnt[l]);
 	  cvaltype cont = Jxw *(innerProduct(A_grad_y,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_y.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
@@ -137,6 +176,8 @@ void uiExperiment::getMat_y()
 void uiExperiment::getMat_p()
 {
   stiff_matrix_p.setZero();
+  triplets_p.clear();
+  
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -152,12 +193,12 @@ void uiExperiment::getMat_p()
     for(int l = 0; l < n_q_pnt; l++){
       double Jxw = ec.Jxw[l];
       setA(A,q_pnt[l]);
+      double u_val = project_u(q_pnt[l]);
       for(int j = 0; j < n_ele_dof; j++){
 	for(int k = 0; k < n_ele_dof; k++){
 	  std::vector<double> A_grad_p(2);
 	  A_grad_p[0] = A(0,0)*bas_grad[j][l][0] + A(0,1)*bas_grad[j][l][1];
 	  A_grad_p[1] = A(1,0)*bas_grad[j][l][0] + A(1,1)*bas_grad[j][l][1];
-	  double u_val = project_u(q_pnt[l]);
 	  cvaltype cont = Jxw *(innerProduct(A_grad_p,bas_grad[k][l])+u_val*bas_val[j][l]*bas_val[k][l]);
 	  triplets_p.push_back(T(ele_dof[j],ele_dof[k],cont));
 	}
@@ -170,6 +211,8 @@ void uiExperiment::getMat_p()
 
 void uiExperiment::getRhs_y()
 {
+  rhs_y.setZero();
+  
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -195,6 +238,8 @@ void uiExperiment::getRhs_y()
 
 void uiExperiment::getRhs_p()
 {
+  rhs_p.setZero();
+  
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space_y.beginElement(),
     end_ele = fem_space_y.endElement();
@@ -210,6 +255,7 @@ void uiExperiment::getRhs_p()
       double Jxw = ec.Jxw[l];
       double y_val = y_h.value(q_pnt[l],*the_ele);
       double y0_val = y_exact.value(q_pnt[l],*the_ele);
+      part_y_val(y0_val,q_pnt[l]);
       for (int j = 0;j < n_ele_dof;j ++) {
 	cvaltype cout = Jxw * bas_val[j][l] * (y_val - y0_val); 
 	rhs_p(ele_dof[j]) += cout;
@@ -282,15 +328,34 @@ void uiExperiment::DirichletBC(Eigen::SparseMatrix<cvaltype,Eigen::RowMajor>& st
   std::cout << "Neumman boundary condition ... OK!"<<std::endl;
   };
 */
-void uiExperiment::getError()
-{  
+void uiExperiment::getError_y()
+{
   double L2error = 0;
-  u_int& n_dof = fem_space_u.n_dof();
+  getMat_error_y();
+  getRhs_exact_y();
+  DirichletBC(stiff_matrix_y,rhs_y,bnd,1);
+  
+  Eigen_solver.compute(stiff_matrix_y);
+  solution_y = Eigen_solver.solve(rhs_y);
+  for(int i=0;i<fem_space_y.n_dof();i++){
+    cvaltype value = solution_y(i);
+    y_error(i) = std::abs(value.real()-y_exact(i));
+    L2error += std::norm(value.real() - y_exact(i));
+  }
+  L2error = sqrt(L2error);
+  std::cout << "\nL2 error_y = " << L2error << std::endl;
+}
+
+void uiExperiment::getError_u()
+{
+  double L2error = 0;
+  const u_int& n_dof = fem_space_u.n_dof();
   for(int i=0;i<n_dof;i++){
+    u_error(i) = std::abs(u_exact(i)-u_h(i));
     L2error += std::norm(u_exact(i) - u_h(i)); 
   }
   L2error = sqrt(L2error);
-  std::cout << "\nL2 error = " << L2error << std::endl;
+  std::cout << "\nL2 error_u = " << L2error << std::endl;
 
   
   /*
@@ -581,6 +646,9 @@ void uiExperiment::buildFEMSpace()
 
   y_exact.reinit(fem_space_y);
   u_exact.reinit(fem_space_u);
+
+  y_error.reinit(fem_space_y);
+  u_error.reinit(fem_space_u);
   
   const int& n_dof = fem_space_y.n_dof();
   stiff_matrix_y.resize(n_dof,n_dof);
@@ -657,24 +725,41 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   std::cout << "OK!" << std::endl;
 }
 
-void uiExperiment::get_exact_y(){
+void uiExperiment::get_exact_y()
+{
+#if 1
   getMat_exact_y();
   getRhs_exact_y();
   DirichletBC(stiff_matrix_y,rhs_y,bnd,1);
   
-  Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
   Eigen_solver.compute(stiff_matrix_y);
   solution_y = Eigen_solver.solve(rhs_y);
   for(int i=0;i<fem_space_y.n_dof();i++){
     cvaltype value = solution_y(i);
     y_exact(i) = value.real();
   }
-  //clear
-  const int& n_dof = fem_space_y.n_dof();
-  stiff_matrix_y.setZero();
-  rhs_y.setZero(n_dof);
-  solution_y.setZero(n_dof);
-  triplets_y.clear();
+  /*
+  /////////////////////////
+  double L2error = 0;
+  for(int i=0;i<fem_space_y.n_dof();i++){
+    const Point<DIM>& point = fem_space_y.dofInfo(i).interp_point;
+    y_h(i) = Y_exact(point);
+    
+    L2error += std::norm(y_h(i) - y_exact(i));
+  }
+  
+  L2error = sqrt(L2error);
+  std::cout << "\nL2 error_y = " << L2error << std::endl;
+  getchar();
+  //////////////////////
+  */
+#else  
+  for(int i=0;i<fem_space_y.n_dof();i++){
+    const Point<DIM>& point = fem_space_y.dofInfo(i).interp_point;
+    y_exact(i) = Y_exact(point);
+  }
+  
+#endif
 }
 
 void uiExperiment::solve()
@@ -683,9 +768,10 @@ void uiExperiment::solve()
   
   // y_exact.writeOpenDXData("y_exact.dx");
   double error;
-  double rho = 0.5;
-  double alpha = 0.1;
+  double rho = 10;
+  double alpha = 1.0e-6;
   double tolerence = 1.0e-5;
+  //int t = 0;
   do{
     //backup old u
     FEMFunction<double,DIM> old_u_h;
@@ -696,8 +782,6 @@ void uiExperiment::solve()
 
     DirichletBC(stiff_matrix_y,rhs_y,bnd,1);
   
-    Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
-
     Eigen_solver.compute(stiff_matrix_y);
     solution_y = Eigen_solver.solve(rhs_y);
   
@@ -718,12 +802,16 @@ void uiExperiment::solve()
       p_h(i) = value.real();
     }
     // Third: update u
+    //std::string u_num;
+    //u_num= "u_h_"+std::to_string(t)+".dx";
+    //u_h.writeOpenDXData(u_num);
+    //t++;
     for(int i=0;i<fem_space_u.n_dof();i++){
       const Point<DIM>& point = fem_space_u.dofInfo(i).interp_point;
       double du = project_y(point);
-      // std::cout<<" du is "<<du<<std::endl;
+      //std::cout<<" du is "<<du<<std::endl;
       u_h(i) = old_u_h(i) - rho*(alpha*old_u_h(i)+du);
-      u_h(i) = std::max(u_h(i),0.0);
+      //u_h(i) = std::max(u_h(i),0.0);
     }
     // Forth: calculate error
     //getError();
@@ -757,7 +845,9 @@ void uiExperiment::saveData()
   y_h.writeOpenDXData("y_h.dx");
   y_exact.writeOpenDXData("y_exact.dx");
   u_exact.writeOpenDXData("u_exact.dx");
-  p_h.writeOpenDXData("p_h.dx");
+  u_error.writeOpenDXData("u_error.dx");
+  y_error.writeOpenDXData("y_error.dx");
+  //p_h.writeOpenDXData("p_h.dx");
   // writeMatlabData("u_r.dat",u_re);
   //writeMatlabData("u_i.dat",u_im);
 };
@@ -769,9 +859,9 @@ void uiExperiment::run()
   do{
     buildFEMSpace();
     solve();
+    getError_u();
+    getError_y();
     saveData();
-    getError();
-
     getIndicator();
     adaptMesh();
       

@@ -33,17 +33,31 @@
  *****************************************************************************
  */
 #define example 1
-#if example
+void part_y_val(double& y_val,const double *p){
+  #if 0
+  // circle part
+  double part_R = 0.5;
+  if(p[0]*p[0]+p[1]*p[1] > part_R*part_R )
+    y_val = 0.0;
+  #else
+  // square part
+  //if(abs(p[0]) <= 1 && p[1] >= 0 )
+  //  y_val = 0.0;
+  #endif
+}
 
+#if example
 
 double U_exact(const double *p){
   double Z = sin(PI*p[0])*sin(PI*p[1]);
-  double val = std::max(-Z,0.0);
-  return val;
+  // double val = std::max(-Z,0.0);
+  return Z;
 }
 
+
 double u_0(const double *p){
-  return 0;
+  double val = 0;
+  return val;
 }
 
 void setA(Eigen::Matrix2d& A,const double *p){
@@ -59,10 +73,6 @@ cvaltype f(const double *p){
   return val;
 }
 
-double y_0(const double *p){
-  return 0.0;
-}
-
 cvaltype bnd(const double *p){
   return 0.0;
 }
@@ -73,40 +83,20 @@ void setA(Eigen::Matrix2d& A,const double *p){
   A(1,0) = 0;
   A(1,1) = 1;
 }
-
-
-double z(const double *p){
-  if(p[0]+p[1] >1.0)
-    return 0.5;
-  else
-    return 0.0;
+double U_exact(const double *p){
+  return 1+0.5*cos(PI*p[0]+PI*p[1]);
 }
+
+
 double u_0(const double *p){
-  return 1.0 - sin(PI/2*p[0])-sin(PI/2*p[1])+z(p);
+  return 1;
 }
 
-cvaltype u_exact(const double *p){
-  double Z = sin(PI*p[0])*sin(PI*p[1]);
-  cvaltype val = std::max(u_0(p)-Z,0.0);
-  return val;
+double f(const double *p){
+  return 10;
 }
-
-double y_0(const double *p){
-  return 100*sqrt((p[0]-1)*(p[0]-1)+(p[1]-1)*(p[1]-1));
-}
-
-cvaltype f(const double *p){
-  double Z = sin(PI*p[0])*sin(PI*p[1]);
-  return 4*pow(PI,4)*Z-u_exact(p)-10000/y_0(p);
-}
-
-double Y_exact(const double *p){
-  double Z = sin(PI*p[0])*sin(PI*p[1]);
-  return 2*PI*PI*Z + y_0(p);
-}
-
 cvaltype bnd(const double *p){
-  return 0;
+  return 0.0;
 }
 #endif
 

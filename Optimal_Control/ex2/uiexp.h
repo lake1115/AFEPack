@@ -93,6 +93,7 @@ public:
  FEMFunction<double,DIM> u_exact;
 
  FEMFunction<double,DIM> u_error;
+ FEMFunction<double,DIM> y_error;
  
  Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> stiff_matrix_y;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> solution_y;
@@ -101,6 +102,8 @@ public:
  Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> stiff_matrix_p;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> solution_p;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> rhs_p;
+ 
+ Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
  
  std::vector<T> triplets_y;
  std::vector<T> triplets_p;
@@ -138,11 +141,13 @@ public:
  void getMat_p();
  void getRhs_exact_y();
  void getMat_exact_y();
+ void getMat_error_y();
  void get_exact_y();
  double project_u(Point<DIM> p);
  double project_y(Point<DIM> p);
  void solve();
- void getError();
+ void getError_u();
+ void getError_y();
  void adaptMesh();
  void getIndicator();
  virtual void saveData();
@@ -152,26 +157,18 @@ public:
 inline
 bool onElement(Point<DIM> pntA,Point<DIM> pntB,Point<DIM> pntC,Point<DIM> pntP){
   std::vector<double> v0(DIM),v1(DIM),v2(DIM);
-  v0[0] = pntC[0]-pntA[0];
-  v0[1] = pntC[1]-pntA[1];
-  v1[0] = pntB[0]-pntA[0];
-  v1[1] = pntB[1]-pntA[1];
-  v2[0] = pntP[0]-pntA[0];
-  v2[1] = pntP[1]-pntA[1];
+  v0[0] = pntC[0]-pntP[0];
+  v0[1] = pntC[1]-pntP[1];
+  v1[0] = pntB[0]-pntP[0];
+  v1[1] = pntB[1]-pntP[1];
+  v2[0] = pntA[0]-pntP[0];
+  v2[1] = pntA[1]-pntP[1];
 
-  double dot00 = v0[0]*v0[0]+v0[1]*v0[1];
-  double dot01 = v0[0]*v1[0]+v0[1]*v1[1];
-  double dot02 = v0[0]*v2[0]+v0[1]*v2[1];
-  double dot11 = v1[0]*v1[0]+v1[1]*v1[1];
-  double dot12 = v1[0]*v2[0]+v1[1]*v2[1];
+  double dot01 = v0[0]*v1[1]-v0[1]*v1[0];
+  double dot12 = v1[0]*v2[1]-v1[1]*v2[0];
+  double dot20 = v2[0]*v0[1]-v2[1]*v0[0];
 
-  double u = (dot11*dot02-dot01*dot12)/(dot00*dot11-dot01*dot01);
-  if(u < 0 || u > 1)
-    return false;
-  double v = (dot00*dot12-dot01*dot02)/(dot00*dot11-dot01*dot01);
-  if(v < 0 || v > 1)
-    return false;
-  return u + v <= 1;
+  return dot01*dot12>=0 && dot01*dot20 >=0;
 };
 
 inline
