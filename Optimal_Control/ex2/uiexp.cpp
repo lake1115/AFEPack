@@ -769,25 +769,23 @@ void uiExperiment::solve()
   // y_exact.writeOpenDXData("y_exact.dx");
   double error;
   double rho = 10;
-  double alpha = 1.0e-6;
-  double tolerence = 1.0e-5;
-  //int t = 0;
+  double alpha = 1.0e-5;
+  double tolerence = 1.0e-4;
+  int t = 0;
+  FEMFunction<double,DIM> old_u_h;
   do{
     //backup old u
-    FEMFunction<double,DIM> old_u_h;
     old_u_h = u_h;
-    // First: solve y 
+    // Firs4: solve y 
     getMat_y();
     getRhs_y();
 
     DirichletBC(stiff_matrix_y,rhs_y,bnd,1);
-  
     Eigen_solver.compute(stiff_matrix_y);
     solution_y = Eigen_solver.solve(rhs_y);
   
     for(int i=0;i<fem_space_y.n_dof();i++){
-      cvaltype value = solution_y(i);
-      y_h(i) = value.real();
+      y_h(i) = solution_y(i).real();
     }
     // Second: solve p
     getMat_p();
@@ -798,8 +796,7 @@ void uiExperiment::solve()
     solution_p = Eigen_solver.solve(rhs_p);
   
     for(int i=0;i<fem_space_y.n_dof();i++){
-      cvaltype value = solution_p(i);
-      p_h(i) = value.real();
+      p_h(i) = solution_p(i).real();
     }
     // Third: update u
     //std::string u_num;
@@ -819,7 +816,8 @@ void uiExperiment::solve()
     error = Functional::L2Norm(old_u_h,3);
     std::cout<<" du = " << error << std::endl;
     //getchar();
-  }while(error>tolerence);
+    t++;
+  }while(error>tolerence || t < 1000);
   
   std::cout<<"********** Finish Iterator *********" <<std::endl;
 };

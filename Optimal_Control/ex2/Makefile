@@ -1,10 +1,11 @@
-# by R.Lie, Nov 01, 2002
-
-include /usr/local/AFEPack/Make.global_options
+CXX = g++
+CXXFLAGS = -O2 -g -std=c++0x -pthread -ftemplate-depth-128 -I/usr/local/include/AFEPack -I/home/binh/afepack
 
 source = $(wildcard *.cpp)
 object = $(patsubst %.cpp, %.o, $(source))
-LDFLAGS +=  -lAFEPack
+LDFLAGS = -L/usr/local/lib -L/usr/lib/gcc/x86_64-linux-gnu/4.4.7
+LIBS = -lAFEPack  -llac -lbase -ltbb  -pthread -llapack -lblas -lgfortran -ldl -lm  
+
 
 all : main
 
@@ -12,8 +13,7 @@ all : main
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 main : $(object)
-	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS)
-#	$(CXX) -o $@ $(object) $< $(CXXFLAGS)
+	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS) 
 
 clean :
 	-rm -rf $(object)
