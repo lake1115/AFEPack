@@ -1,5 +1,5 @@
 
-lc = 1;
+lc = 0.2;
 
 
 Function Ball

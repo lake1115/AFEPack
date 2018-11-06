@@ -528,9 +528,9 @@ void uiExperiment::buildDGFEMSpace(int bmark)
 
   Mesh<DIM,DIM>& mesh = fem_space.mesh();
   // calculate Neumann boundary number
-  int n_side = mesh.n_geometry(DIM-1);
+  int n_surface = mesh.n_geometry(DIM-1);
   int n_dg_ele = 0;
-  for(int i=0;i<n_side;i++){
+  for(int i=0;i<n_surface;i++){
     // here only for mark=2 
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
       n_dg_ele +=1;
@@ -538,7 +538,7 @@ void uiExperiment::buildDGFEMSpace(int bmark)
 
   // build DGElement
   fem_space.dgElement().resize(n_dg_ele);
-  for(int i=0,j=0;i<n_side;i++){
+  for(int i=0,j=0;i<n_surface;i++){
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
       fem_space.dgElement(j).reinit(fem_space,i,0);
       j += 1;
@@ -547,7 +547,7 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   fem_space.buildDGElement();
   
   std::cout << "Update DG Data Cache ...";
-  std::cout << " bmark: "<<bmark<<" ..."<< " side: "<< n_dg_ele<<" ...";
+  std::cout << " bmark: "<<bmark<<" ..."<< " surface: "<< n_dg_ele<<" ...";
   if(bmark_count == n_bmark)
     std::cerr<<"Error: not enough bmark number"<<std::endl;
   updateDGGeometryCache(edge_cache[bmark_count]);
@@ -561,13 +561,13 @@ void uiExperiment::solve()
   getMat();
   getRhs();
   
-  //NeummanBC(g,1);
+  NeummanBC(g,1);
 
   //TransparentBC(2);
   
-  DirichletBC(bnd,2);
-  //NeummanBC(g2,2);
-  DirichletBC(bnd,1);
+  //DirichletBC(bnd,2);
+  NeummanBC(g2,2);
+  //DirichletBC(bnd,1);
   Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
 
   Eigen_solver.compute(stiff_matrix);
@@ -601,7 +601,7 @@ void uiExperiment::saveData()
 {
   u_re.writeOpenDXData("u_re.dx");
   u_im.writeOpenDXData("u_im.dx");
-  //u_exact_re.writeOpenDXData("u_exact_re.dx");
+  u_exact_re.writeOpenDXData("u_exact_re.dx");
   Error.writeOpenDXData("error.dx");
   //writeMatlabData("u_r.dat",u_re);
   //writeMatlabData("u_i.dat",u_im);
