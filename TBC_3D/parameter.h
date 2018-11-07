@@ -96,15 +96,15 @@ cvaltype g1(const double *p){
 #else
 // cube case for test
 cvaltype u_exact(const double *p){
-  cvaltype val = sin(PI*p[0])*sin(PI*p[1])*cos(PI*p[2]);
+  cvaltype val = sin(PI*p[0])*sin(PI*p[1])*sin(PI*p[2]);
   return val;
 }
 
 cvec_type u_exact_prime(const double *p){
   cvec_type val;
-  val[0] = PI*cos(PI*p[0])*sin(PI*p[1])*cos(PI*p[2]);
+  val[0] = PI*cos(PI*p[0])*sin(PI*p[1])*sin(PI*p[2]);
   val[1] = PI*cos(PI*p[1])*cos(PI*p[2])*sin(PI*p[0]);
-  val[2] = -PI*sin(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]);
+  val[2] = PI*cos(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]);
   return val;
 }
 
@@ -138,18 +138,21 @@ cvaltype g2(const double *p){
 cvaltype g(const double *p){
   double r = sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
   
-  cvaltype dx = PI*cos(PI*p[0])*sin(PI*p[1])*cos(PI*p[2]);
-  cvaltype dy = PI*cos(PI*p[1])*cos(PI*p[2])*sin(PI*p[0]);
-  cvaltype dz = -PI*sin(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]);
+  cvaltype dx = PI*cos(PI*p[0])*sin(PI*p[1])*sin(PI*p[2]);
+  cvaltype dy = PI*cos(PI*p[1])*sin(PI*p[2])*sin(PI*p[0]);
+  cvaltype dz = PI*cos(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]);
+  cvaltype val= p[0]/r*dx + p[1]/r*dy + p[2]/r*dz;
+  return val;
+}
+cvaltype g2(const double *p){
+  double r = sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
+  
+  cvaltype dx = PI*cos(PI*p[0])*sin(PI*p[1])*sin(PI*p[2]);
+  cvaltype dy = PI*cos(PI*p[1])*sin(PI*p[2])*sin(PI*p[0]);
+  cvaltype dz = PI*cos(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]);
   cvaltype val= -p[0]/r*dx - p[1]/r*dy - p[2]/r*dz;
   return val;
 }
-/*
-cvaltype g2(const double *p){
-  cvaltype val=PI/R*(p[0]*cos(PI*p[0])*sin(PI*p[1])*sin(PI*p[2])+p[1]*cos(PI*p[1])*sin(PI*p[2])*sin(PI*p[0])+p[2]*cos(PI*p[2])*sin(PI*p[0])*sin(PI*p[1]));
-  return val;
-}
-*/
 #endif
 
 cvaltype bnd(const double *p){

@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
   for(int i = 0;i < n_line;++ i){
     GeometryBM& line_geo = mesh.geometry(1, i);
-    line_geo.boundaryMark() = 0;/// assume it is't boundary
+    line_geo.boundaryMark() = 0;/// assume it is not boundary
     std::vector<int>& vtx = line_geo.vertex();
     
     if(mesh.geometry(0, vtx[0]).boundaryMark() == 1 && mesh.geometry(0,vtx[1]).boundaryMark() == 1){
@@ -99,6 +99,7 @@ int main(int argc, char* argv[])
     GeometryBM& tet_geo = mesh.geometry(3, i);
     
     tet_geo.boundaryMark() = 0;
+
 /*
     const int& n_bnd = tet_geo.n_boundary();
     for(int j = 0;j < n_bnd;++ j){

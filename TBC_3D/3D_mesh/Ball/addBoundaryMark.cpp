@@ -108,7 +108,8 @@ int main(int argc, char* argv[])
     GeometryBM& tet_geo = mesh.geometry(3, i);
     
     tet_geo.boundaryMark() = 0;
-
+    // don't add tetrahedron boundary, it will make Neumann boundary wrong
+    /*
     const int& n_bnd = tet_geo.n_boundary();
     for(int j = 0;j < n_bnd;++ j){
       if(mesh.geometry(2, tet_geo.boundary()[j]).boundaryMark() == 1){
@@ -116,6 +117,7 @@ int main(int argc, char* argv[])
 	break;
       }
     }
+    */
   }
 
   std::cout << "boundary tetrahedron are done..." << std::endl;  
