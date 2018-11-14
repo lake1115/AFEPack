@@ -1,0 +1,16 @@
+object 1 class array type float rank 1 shape 2 item 4 data follows
+1.000000000000e+00	1.000000000000e+00	
+-1.000000000000e+00	1.000000000000e+00	
+-1.000000000000e+00	-1.000000000000e+00	
+1.000000000000e+00	-1.000000000000e+00	
+
+object 2 class array type int rank 1 shape 3 item 2 data follows
+0	1	2	
+0	2	3	
+attribute "element type" string "triangles"
+attribute "ref" string "positions"
+
+object "FEMFunction-2d" class field
+component "positions" value 1
+component "connections" value 2
+end
