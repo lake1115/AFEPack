@@ -39,7 +39,7 @@ cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
     u_hat += cout*exp(-1.0*I*N*theta);
     M++;
   }
-  u_hat = u_hat/M;
+  //u_hat = u_hat/M;
   return u_hat;
 }
 
@@ -172,9 +172,9 @@ void uiExperiment::TransparentBC(int bmark)
   cvaltype H,u_hat;
   double theta,theta2;
   for(int n=-order;n<=order;n++){
+    std::cout<<" n = "<<n<<std::endl;
     H = get_h(n);
-    u_hat = 0;
-    //u_hat = get_u_hat(n,1);
+    cvaltype u_hat2 = get_u_hat(n,1);
     double N = 1.0*n;
     DGFEMSpace<double,DIM>::DGElementIterator
       the_dgele = fem_space.beginDGElement(),
@@ -190,17 +190,13 @@ void uiExperiment::TransparentBC(int bmark)
 	const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
 	int n_dgele_dof = dgele_dof.size();
 	
-	//std::cout<<" n_q_pnt "<<n_q_pnt<<std::endl;
 	for(int l=0;l<n_q_pnt;l++){
 	  double Jxw = edgec.Jxw[l];
 	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
-	  // std::cout<<" point: "<<q_pnt[l][0]<<" "<<q_pnt[l][1]<<std::endl;
 	  if(theta<0)
 	    theta += 2*PI;
-	  // std::cout<<" Jxw = "<<Jxw<<" theta "<<theta<<std::endl;
 	  for(int j=0;j<n_dgele_dof;j++){
 	    u_hat = Jxw*bas_val[j][l]*exp(-1.0*I*N*theta)/2.0/PI;
-	    //std::cout<<" dgele_dof: "<<dgele_dof[j]<<" j = "<<j<<" u_hat "<<u_hat<<std::endl;
 	    the_dgele2 = fem_space.beginDGElement();
 	    for(u_int t = 0; the_dgele2 !=end_dgele;++the_dgele2,++t){
 	      EdgeCache<double,DIM>& edgec2 = edge_cache[bmark_count][t];
@@ -212,13 +208,14 @@ void uiExperiment::TransparentBC(int bmark)
 	      for(int l=0;l<n_q_pnt2;l++){
 		double Jxw = edgec2.Jxw[l];
 		theta2 = atan2(q_pnt2[l][1],q_pnt2[l][0]);
-		//std::cout<<" point2: "<<q_pnt2[l][0]<<" "<<q_pnt2[l][1]<<std::endl;
  		if(theta2<0)
 		  theta2 += 2*PI;
 		for(int k=0;k<n_dgele_dof2;k++){
 		  cvaltype cout = Jxw*exp(I*N*theta2)*bas_val2[k][l];
 		  cvaltype value = -1/R*H*u_hat*cout;
-		  // std::cout<<" j = " << j<< " k = "<<k<<" dgele_dofk: "<<dgele_dof2[k] <<" value = "<<value<<std::endl;
+		  // I don't know why I calculate twice
+		  if(dgele_dof[j]!=dgele_dof2[k])
+		     value = value /2.0;
 		  triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
 		}
 	      }
@@ -230,7 +227,6 @@ void uiExperiment::TransparentBC(int bmark)
   
   stiff_matrix.setZero();
   stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
-  // std::cout<<stiff_matrix;
   std::cout << "Transparent boundary condition ... OK!"<<std::endl;
 };
 
@@ -546,7 +542,7 @@ void uiExperiment::buildFEMSpace()
   triplets.clear();
   
   std::cout << "Update Data Cache ...";
-  updateGeometryCache(0);
+  updateGeometryCache(3);
   std::cout << "OK!" << std::endl;
   // for record Neumman bc bmark
   edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
@@ -593,7 +589,7 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   std::cout << " bmark: "<<bmark<<" ..."<< " side: "<< n_dg_ele<<" ...";
   if(bmark_count == n_bmark)
     std::cerr<<"Error: not enough bmark number"<<std::endl;
-  updateDGGeometryCache(edge_cache[bmark_count],0);
+  updateDGGeometryCache(edge_cache[bmark_count],3);
   std::cout << "OK!" << std::endl;
 }
 
