@@ -3,7 +3,7 @@
 //#include <boost/math/special_functions/bessel.hpp>
 //#include <boost/math/special_functions/bessel_prime.hpp>
 //#include <boost/math/special_functions/hankel.hpp>
-
+#include <ctime>
 cvaltype get_h(int n)
 {
   cvaltype h;
@@ -65,7 +65,7 @@ void uiExperiment::getMat()
       for(int j = 0; j < n_ele_dof; j++){
 	for(int k = 0; k < n_ele_dof; k++){
 	  cvaltype cout = Jxw *(c_val*innerProduct(bas_grad[j][l],bas_grad[k][l])+(a_val*bas_val[j][l]*bas_val[k][l]));
-	  triplets.push_back(T(ele_dof[j],ele_dof[k],cout));
+	   triplets.push_back(T(ele_dof[j],ele_dof[k],cout));
 	}
       }
       
@@ -169,18 +169,24 @@ void uiExperiment::TransparentBC(int bmark)
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
+  double M = fem_space.n_DGElement();
+  //std::cout<<" M = "<<M<<std::endl;
   cvaltype H,u_hat;
   double theta,theta2;
+  clock_t start,end;
+  start = clock();
   for(int n=-order;n<=order;n++){
     std::cout<<" n = "<<n<<std::endl;
     H = get_h(n);
-    cvaltype u_hat2 = get_u_hat(n,1);
+    // cvaltype u_hat2 = get_u_hat(n,1);
     double N = 1.0*n;
     DGFEMSpace<double,DIM>::DGElementIterator
-      the_dgele = fem_space.beginDGElement(),
+     the_dgele = fem_space.beginDGElement(),
       end_dgele = fem_space.endDGElement();
     DGFEMSpace<double,DIM>::DGElementIterator
       the_dgele2 = fem_space.beginDGElement();
+
+    
     for (u_int i = 0; the_dgele != end_dgele;++ the_dgele,++i) 
       {
 	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
@@ -189,14 +195,29 @@ void uiExperiment::TransparentBC(int bmark)
 	std::vector<std::vector<double> > bas_val = edgec.basis_value;
 	const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
 	int n_dgele_dof = dgele_dof.size();
-	
+	//	std::cout<<"n_q_pnt = "<<n_q_pnt<<std::endl;
 	for(int l=0;l<n_q_pnt;l++){
 	  double Jxw = edgec.Jxw[l];
 	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
 	  if(theta<0)
 	    theta += 2*PI;
 	  for(int j=0;j<n_dgele_dof;j++){
-	    u_hat = Jxw*bas_val[j][l]*exp(-1.0*I*N*theta)/2.0/PI;
+	    u_hat = Jxw*bas_val[j][l]*exp(-1.0*I*N*theta)/2.0/PI/R;
+    
+    /*
+    /////////////////////
+    const u_int& n_dof = fem_space.n_dof();
+    for(int i = 0; i<n_dof; i++){
+      int bm = fem_space.dofInfo(i).boundary_mark;
+      if(bm != 2)
+	continue;
+      const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+      theta = atan2(point[1],point[0]);
+      if(theta < 0)
+	theta += 2*PI;
+      u_hat = exp(-1.0*I*N*theta)/M; 
+    ////////////////////
+    */
 	    the_dgele2 = fem_space.beginDGElement();
 	    for(u_int t = 0; the_dgele2 !=end_dgele;++the_dgele2,++t){
 	      EdgeCache<double,DIM>& edgec2 = edge_cache[bmark_count][t];
@@ -205,28 +226,32 @@ void uiExperiment::TransparentBC(int bmark)
 	      std::vector<std::vector<double> > bas_val2 = edgec2.basis_value;
 	      const std::vector<int>& dgele_dof2 = edgec2.p_neigh->dof();
 	      int n_dgele_dof2 = dgele_dof2.size();
-	      for(int l=0;l<n_q_pnt2;l++){
-		double Jxw = edgec2.Jxw[l];
-		theta2 = atan2(q_pnt2[l][1],q_pnt2[l][0]);
+	      for(int l2=0;l2<n_q_pnt2;l2++){
+		double Jxw2 = edgec2.Jxw[l2];
+		theta2 = atan2(q_pnt2[l2][1],q_pnt2[l2][0]);
  		if(theta2<0)
 		  theta2 += 2*PI;
 		for(int k=0;k<n_dgele_dof2;k++){
-		  cvaltype cout = Jxw*exp(I*N*theta2)*bas_val2[k][l];
+		  cvaltype cout = Jxw2*exp(I*N*theta2)*bas_val2[k][l2];
 		  cvaltype value = -1/R*H*u_hat*cout;
+		  // cvaltype value = u_hat*cout;
 		  // I don't know why I calculate twice
-		  if(dgele_dof[j]!=dgele_dof2[k])
-		     value = value /2.0;
-		  triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
+		  //  if(dgele_dof[j]!=dgele_dof2[k])
+		  // value = value /2.0;
+		   triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
+		  //triplets.push_back(T(i,dgele_dof2[k],value));
 		}
 	      }
 	    }	 
 	  }
 	}     	 
-      }
+   }
   }
-  
+  end = clock();
+  std::cout<< " time: " << (double)(end-start)/CLOCKS_PER_SEC<<std::endl;
   stiff_matrix.setZero();
   stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
+  //std::cout<<stiff_matrix;
   std::cout << "Transparent boundary condition ... OK!"<<std::endl;
 };
 
@@ -300,23 +325,23 @@ void uiExperiment::getError()
       u_h_grad[0] = u_re_grad[l][0]+I*u_im_grad[l][0];
       u_h_grad[1] = u_re_grad[l][1]+I*u_im_grad[l][1];   
       cvaltype u_exact_val = u_exact(q_pnt[l]);
-      //cvec_type u_exact_grad = u_exact_prime(q_pnt[l]);
+      cvec_type u_exact_grad = u_exact_prime(q_pnt[l]);
       
       double df_value = std::norm(u_exact_val-u_h_val);
-      //double df_grad = std::norm(u_exact_grad[0]-u_h_grad[0])+std::norm(u_exact_grad[1]-u_h_grad[1]);
+      double df_grad = std::norm(u_exact_grad[0]-u_h_grad[0])+std::norm(u_exact_grad[1]-u_h_grad[1]);
       
       L2error += Jxw*df_value;
-      // L2error_grad += Jxw*df_grad;
+      L2error_grad += Jxw*df_grad;
       
       residual += Jxw*(-c_val*(u_h_grad[0]*u_h_grad[0]+u_h_grad[1]*u_h_grad[1])+a_val*u_h_val);
     }
     ec.residual = std::abs(residual);
   }
   L2error = sqrt(fabs(L2error));
-  //L2error_grad = sqrt(fabs(L2error_grad));
+  L2error_grad = sqrt(fabs(L2error_grad));
   
   std::cout << "\nL2 error = " << L2error << std::endl;
-  //std::cout << "\nL2 gradient error = " << L2error_grad << std::endl;
+  std::cout << "\nL2 gradient error = " << L2error_grad << std::endl;
 }
 
 void uiExperiment::getError_h()
@@ -603,7 +628,7 @@ void uiExperiment::solve()
 
   TransparentBC(2);
   
-  //DirichletBC(bnd,2);
+  // DirichletBC(bnd,2);
   //NeummanBC(g2,2);
   //DirichletBC(bnd,1);
   Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
@@ -656,7 +681,7 @@ void uiExperiment::run()
     getError();  
     saveData();
     getIndicator();
-    getError_h();
+    // getError_h();
     adaptMesh();
       
     getchar();
