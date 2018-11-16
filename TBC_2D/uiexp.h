@@ -98,16 +98,16 @@ public:
  Indicator<DIM> indicator;
  MeshAdaptor<DIM> mesh_adaptor;
  
- double sys_t0 = 0;		///system start time
- double dt = 1;			/// time step
+ double sys_t0;		///system start time
+ double dt;			/// time step
  int order;
 
  int n_bmark;
  int bmark_count;
  std::vector<int> bmark_list;
 
- cvaltype u_hat;
- 
+ std::vector<int> dg_dof;
+ std::vector<cvaltype> u_hat;
  public:
  uiExperiment(const std::string& file);
 
@@ -123,7 +123,7 @@ public:
  void NeummanBC(CFunc g,int bmark);
  void getRhs();
  void getMat();
- cvaltype get_u_hat(int n,cvaltype cout);
+ cvaltype get_u_hat(int n);
  void TransparentBC(int bmark);
  void solve();
  void getError();

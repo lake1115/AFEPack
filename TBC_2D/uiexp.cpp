@@ -1,8 +1,6 @@
 #include "uiexp.h"
 #include "parameter.h"
-//#include <boost/math/special_functions/bessel.hpp>
-//#include <boost/math/special_functions/bessel_prime.hpp>
-//#include <boost/math/special_functions/hankel.hpp>
+#include <ctime>
 
 cvaltype get_h(int n)
 {
@@ -17,32 +15,25 @@ cvaltype get_h(int n)
   return h;
 }
 
-cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
+cvaltype uiExperiment::get_u_hat(int n)
 {
   // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i)) 
-  double M = 0;
+  double M = fem_space.n_DGElement();
   double theta;
   cvaltype u_hat = 0;
   double N = 1.0*n;
-  //cvaltype H_n = boost::math::cyl_hankel_1(0,kappa*R);
-  const u_int& n_dof = fem_space.n_dof();
-  for(int i = 0; i<n_dof; i++){
-    int bm = fem_space.dofInfo(i).boundary_mark;
-    if(bm != 2)
-      continue;
-    const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+  for(int i = 0; i< M ; i++){
+    const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
     theta = atan2(point[1],point[0]);
     if(theta < 0)
       theta += 2*PI;
-    cvaltype u_ex = u_exact(point);
-    u_hat += u_ex*exp(-1.0*I*N*theta);
-    //u_hat += cout*exp(-1.0*I*N*theta);
-    M++;
+    //cvaltype cout = u_exact(point);
+    cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
+    u_hat += cout*exp(-1.0*I*N*theta);
   }
   u_hat = u_hat/M;
   return u_hat;
 }
-
 
 void uiExperiment::getMat()
 {
@@ -165,28 +156,44 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
 
 void uiExperiment::TransparentBC(int bmark)
 {
-  // don't need to use datacache, because each boundary treat independent and only use once.
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
+  double M = fem_space.n_DGElement();
+  
+  dg_dof.resize(M);
+  for(int i = 0,j = 0; i < fem_space.n_dof(); i++){
+    int bm = fem_space.dofInfo(i).boundary_mark;
+    if(bm != 2)
+      continue;
+    dg_dof[j] = i;
+    j++;
+  }
+
   cvaltype H,u_hat;
   double theta;
   for(int n=-order;n<=order;n++){
+    std::cout<<" n = "<<n<<std::endl;
     H = get_h(n);
-    u_hat = get_u_hat(n,1);
+    //u_hat = get_u_hat(n);
     double N = 1.0*n;
-    DGFEMSpace<double,DIM>::DGElementIterator
-      the_dgele = fem_space.beginDGElement(),
-      end_dgele = fem_space.endDGElement();
-    for (u_int i = 0; the_dgele != end_dgele;++ the_dgele,++i) 
-      {
-	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
+    for(int i=0; i<M;i++){
+      const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
+      theta = atan2(point[1],point[0]);
+      if(theta < 0)
+	theta += 2*PI;
+      u_hat = exp(-1.0*I*N*theta)/M; 
+
+      DGFEMSpace<double,DIM>::DGElementIterator
+	the_dgele = fem_space.beginDGElement(),
+	end_dgele = fem_space.endDGElement();
+      for (u_int t = 0; the_dgele != end_dgele;++ the_dgele,++t){
+	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][t];
 	std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
 	const int& n_q_pnt = edgec.n_quad_pnt;
 	std::vector<std::vector<double> > bas_val = edgec.basis_value;
 	const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
 	int n_dgele_dof = dgele_dof.size();
-	
 	for(int l=0;l<n_q_pnt;l++){
 	  double Jxw = edgec.Jxw[l];
 	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
@@ -194,16 +201,12 @@ void uiExperiment::TransparentBC(int bmark)
 	    theta += 2*PI;
 	  for(int j=0;j<n_dgele_dof;j++){
 	    ///////////////////
-	    rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*N*theta)*Jxw*bas_val[j][l];
+	    //rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*N*theta)*Jxw*bas_val[j][l];
 	    //////////////////
-	    /*
-	    for(int k=0;k<n_dgele_dof;k++){
-	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l]*bas_val[k][l];
-	      cvaltype value = -1/R*H*get_u_hat(n,cout);
-	      triplets.push_back(T(dgele_dof[j],dgele_dof[k],value));
+	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l];
+	      cvaltype value = -1/R*H*cout*u_hat;
+	      triplets.push_back(T(dg_dof[i],dgele_dof[j],value));
 	    } 
-	    */
-	    
 	  }
 	}
       }
@@ -376,6 +379,10 @@ void uiExperiment::getIndicator()
     //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
   }
   //in Transparent boundary
+  for(int n=-order;n<=order;n++){
+    u_hat[n+order] = get_u_hat(n);
+  }
+
   for(u_int k=0;k<edge_cache[2].size();++k){
     EdgeCache<double,DIM>& edgec = edge_cache[2][k];
     std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
@@ -383,24 +390,20 @@ void uiExperiment::getIndicator()
     const int& n_q_pnt = edgec.n_quad_pnt;
     for(int l=0;l<n_q_pnt;l++){
       double Jxw = edgec.Jxw[l];
-      double u_re_val = u_re.value(q_pnt[l],*ele);
-      double u_im_val = u_im.value(q_pnt[l],*ele);
       std::vector<double> u_re_grad = u_re.gradient(q_pnt[l], *ele);
       std::vector<double> u_im_grad = u_im.gradient(q_pnt[l], *ele);
       std::vector<cvaltype> u_h_grad(2);
       u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
       u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];
       cvaltype a = (u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]);
-      cvaltype u_h_val(u_re_val,u_im_val);
       cvaltype T_val=0.0;
       for(int n=-order;n<=order;n++){
 	cvaltype H = get_h(n);
 	double N = 1.0*n;
-	cvaltype u_hat = get_u_hat(n,u_h_val);
 	double theta = atan2(q_pnt[l][1],q_pnt[l][0]);
 	if(theta<0)
 	  theta += 2*PI;
-	T_val += 1/R*H*u_hat*exp(I*N*theta);
+	T_val += 1/R*H*u_hat[n+order]*exp(I*N*theta);
       }
       jump[edgec.idx] += Jxw*std::norm(2.0*(a-T_val));
     }
@@ -434,6 +437,7 @@ uiExperiment::uiExperiment(const std::string& file)
   mesh_file = file;
   order = Order;
   n_bmark = 3;
+  u_hat.resize(order*2+1);
 };
 
 uiExperiment::~uiExperiment()
@@ -623,8 +627,8 @@ void uiExperiment::saveData()
   u_im.writeOpenDXData("u_im.dx");
   u_exact_re.writeOpenDXData("u_exact_re.dx");
   Error.writeOpenDXData("error.dx");
-  writeMatlabData("u_r.dat",u_re);
-  writeMatlabData("u_i.dat",u_im);
+  //writeMatlabData("u_r.dat",u_re);
+  //writeMatlabData("u_i.dat",u_im);
 };
 
 

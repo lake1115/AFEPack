@@ -42,10 +42,6 @@ struct ElementCache : public GeometryCache<DIM>
   std::vector<value_type> bnd_length_list;
   std::vector<std::vector<value_type> > bnd_un_list;
   double diameter;
-  //SolutionCache<value_type> phi_p_x;
-  //SolutionCache<value_type> phi_p_y;
-  //SolutionCache<value_type> phi_x;
-  //SolutionCache<value_type> phi_y;
   std::vector<std::vector<value_type> > basis_value;
   std::vector<std::vector<std::vector<value_type> > > basis_gradient;
 
