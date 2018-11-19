@@ -1,0 +1,132 @@
+/**
+ * @file   addBoundaryMark.cpp
+ * @author Hu Guanghui <gary@Brin>
+ * @date   Sat Mar 12 18:26:37 2016
+ * 
+ * @brief  add boundary mark on the mesh
+ *
+ * ./addBoundaryMark input_mesh output_mesh
+ * 
+ */
+#include <iostream>
+#include <AFEPack/Geometry.h>
+
+#define DIM 3
+
+const double radius_cube = 1.;
+const double radius_sphere = 2.0;
+
+bool onBoundary(const double * p,u_int i)
+{
+#if 0 /// for cube
+  if (fabs(p[0] + 1.0) < 1.0e-03 || fabs(p[0] - 1.) < 1.0e-03){
+    return true;
+  }
+  else if (fabs(p[1] + 1.0) < 1.0e-03 || fabs(p[1] - 1.) < 1.0e-03){
+    return true;
+  }
+  else if (fabs(p[2] + 1.0) < 1.0e-03 || fabs(p[2] - 1.) < 1.0e-03){
+    return true;
+  }
+  else{
+    return false;
+  }
+#else /// for sphere
+  
+  if(fabs(sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) - radius_sphere) < 1.0e-03){
+    std::cout << "Point: "<<i<< ", The length is " << sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) << ", and the boundary mark is " << 1 << std::endl;    
+    return true;
+
+  }
+  else{
+
+    std::cout << "Point: "<<i<<", The length is " << sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) << ", and the boundary mark is " << 0 << std::endl;
+        return false;
+  }
+#endif
+}
+
+int main(int argc, char* argv[])
+{
+  Mesh<DIM> mesh;
+  mesh.readData(argv[1]);
+  
+  const int& n_pnt = mesh.n_point();
+
+  for(int i = 0;i < n_pnt;++ i){
+    GeometryBM& pnt_geo = mesh.geometry(0, i);
+    Point<DIM>& pnt = mesh.point(i);
+
+    if(onBoundary(pnt,i)){
+      pnt_geo.boundaryMark() = 1;
+    }
+    else{
+      pnt_geo.boundaryMark() = 0;
+    }
+
+  }
+
+  std::cout << "boundary points are done..." << std::endl;
+  
+  const int& n_line = mesh.n_geometry(1);
+
+  for(int i = 0;i < n_line;++ i){
+    GeometryBM& line_geo = mesh.geometry(1, i);
+    line_geo.boundaryMark() = 1;/// assume it is boundary
+    const int& n_vtx = line_geo.n_vertex();
+
+    for(int j = 0;j < n_vtx;++ j){
+      if(mesh.geometry(0, line_geo.vertex()[j]).boundaryMark() == 0){
+	line_geo.boundaryMark() = 0;
+	break;
+      }
+    }
+  }
+
+  std::cout << "boundary lines are done..." << std::endl;
+  
+  const int& n_tri = mesh.n_geometry(2);
+
+  for(int i = 0;i < n_tri;++ i){
+    GeometryBM& tri_geo = mesh.geometry(2, i);
+
+    tri_geo.boundaryMark() = 1;
+    const int& n_vtx = tri_geo.n_vertex();
+    for(int j = 0;j < n_vtx;++ j){
+      if(mesh.geometry(0, tri_geo.vertex()[j]).boundaryMark() == 0){
+	tri_geo.boundaryMark() = 0;
+	break;
+      }
+    }
+  }
+
+  std::cout << "boundary triangle are done..." << std::endl;
+  
+  const int& n_tet = mesh.n_geometry(3);
+
+  for(int i = 0;i < n_tet;++ i){
+    GeometryBM& tet_geo = mesh.geometry(3, i);
+    
+    tet_geo.boundaryMark() = 0;
+    // don't add tetrahedron boundary, it will make Neumann boundary wrong
+    /*
+    const int& n_bnd = tet_geo.n_boundary();
+    for(int j = 0;j < n_bnd;++ j){
+      if(mesh.geometry(2, tet_geo.boundary()[j]).boundaryMark() == 1){
+	tet_geo.boundaryMark() = 1;
+	break;
+      }
+    }
+    */
+  }
+
+  std::cout << "boundary tetrahedron are done..." << std::endl;  
+  
+  mesh.writeData(argv[2]);
+  
+  return 0;
+}
+/**
+ * end of file
+ * 
+ */
