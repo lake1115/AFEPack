@@ -24,7 +24,7 @@
  *****************************************************************************
  */
 #define example 1
-const double kappa = 1;
+const double kappa = 2*PI;
 const double lambda = 1;
 const double R = 1;
 const double r = 0.5;

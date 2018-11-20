@@ -1,6 +1,6 @@
 #include "uiexp.h"
 #include "parameter.h"
-
+#include <ctime>
 cvaltype get_Theta(int n)
 {
   cvaltype Theta;
@@ -29,8 +29,8 @@ cvaltype uiExperiment::get_u_hat(int n, int m)
     if(phi < 0)
       phi += 2*PI;
     cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
-    //cvaltype cout = u_exact(point);
-    cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
+    cvaltype cout = u_exact(point);
+    //cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
     u_hat += cout*std::conj(Y);  
   }
   u_hat = 4*PI*R*R*u_hat/M;
@@ -182,12 +182,15 @@ void uiExperiment::TransparentBC(int bmark)
 
   cvaltype Theta,u_hat;
   double theta,phi;
+  double theta2,phi2;
+  clock_t start,end;
+  start = clock();
   for(int n = 0; n <= order; n++){
     Theta = get_Theta(n);
     for(int m = -n; m <= n; m++){
       std::cout<<" n = "<<n <<" m = "<<m<< std::endl;
       //u_hat = get_u_hat(n,m);
-      
+      /* 
       for(int i=0; i<M; i++){
 	const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
         theta = acos(point[2]/R);
@@ -196,42 +199,66 @@ void uiExperiment::TransparentBC(int bmark)
 	  phi += 2*PI;
 	cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi); 
 	u_hat = 4*PI/M*std::conj(Y);
-      
-      
-	DGFEMSpace<double,DIM>::DGElementIterator
-	  the_dgele = fem_space.beginDGElement(),
-	  end_dgele = fem_space.endDGElement();
-	for (u_int t = 0;the_dgele != end_dgele;++ the_dgele,++t) 
-	  {
-	    EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][t];
-	    std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
-	    const int& n_q_pnt = edgec.n_quad_pnt;
-	    std::vector<std::vector<double> > bas_val = edgec.basis_value;
-	    const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
-	    int n_dgele_dof = dgele_dof.size();
+      */
 
-	    for(int l=0;l<n_q_pnt;l++){
-	      double Jxw = edgec.Jxw[l];
-	      theta = acos(q_pnt[l][2]/R);
-	      phi = atan2(q_pnt[l][1],q_pnt[l][0]);
-	      if(phi < 0)
-		phi += 2*PI;
+      DGFEMSpace<double,DIM>::DGElementIterator
+	the_dgele = fem_space.beginDGElement(),
+	end_dgele = fem_space.endDGElement();
+
+      DGFEMSpace<double,DIM>::DGElementIterator
+	the_dgele2 = fem_space.beginDGElement();
+      for (u_int i = 0; the_dgele != end_dgele; ++ the_dgele,++i)
+	{
+	  EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
+	  std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+	  const int& n_q_pnt = edgec.n_quad_pnt;
+	  std::vector<std::vector<double> > bas_val = edgec.basis_value;
+	  const std::vector<int>& dgele_dof = edgec.p_neigh->dof();
+	  int n_dgele_dof = dgele_dof.size();
+	  for(int l=0;l<n_q_pnt;l++){
+	    double Jxw = edgec.Jxw[l];
+	    theta = acos(q_pnt[l][2]/R);
+	    phi = atan2(q_pnt[l][1],q_pnt[l][0]);
+	    if(phi < 0)
+	      phi += 2*PI;
+	    cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
+	    for(int j=0;j<n_dgele_dof;j++){
+	      u_hat = Jxw*bas_val[j][l]*std::conj(Y);
+
+	      the_dgele2 = fem_space.beginDGElement();
+	      for (u_int t = 0;the_dgele2 != end_dgele;++the_dgele2,++t) 
+		{
+		EdgeCache<double,DIM>& edgec2 = edge_cache[bmark_count][t];
+		std::vector<Point<DIM> >& q_pnt2 = edgec2.q_pnt;
+		const int& n_q_pnt2 = edgec2.n_quad_pnt;
+		std::vector<std::vector<double> > bas_val2 = edgec2.basis_value;
+		const std::vector<int>& dgele_dof2 = edgec2.p_neigh->dof();
+		int n_dgele_dof2 = dgele_dof2.size();
+
+		for(int l2=0;l2<n_q_pnt2;l2++){
+		  double Jxw2 = edgec2.Jxw[l2];
+		  theta2 = acos(q_pnt2[l2][2]/R);
+		  phi2 = atan2(q_pnt2[l2][1],q_pnt2[l2][0]);
+		  if(phi2 < 0)
+		    phi2 += 2*PI;
 	  
-	      cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
-	      for(int j=0;j<n_dgele_dof;j++){
+		  cvaltype Y2 = boost::math::spherical_harmonic(n,m,theta2,phi2);
+		  for(int k=0;k<n_dgele_dof2;k++){
 		///////////////////
 		//rhs(dgele_dof[j]) += -1/R*Theta*u_hat*Y*Jxw*bas_val[j][l];
 		//////////////////
-		cvaltype cout = Jxw*Y*bas_val[j][l];
-		cvaltype value = 1/R*Theta*cout*u_hat;
-		triplets.push_back(T(dg_dof[i],dgele_dof[j],value));
-	      } 	      
+		    cvaltype cout = Jxw2*Y2*bas_val2[k][l2];
+		    cvaltype value = 1/R*Theta*cout*u_hat;
+		    triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
+		    //triplets.push_back(T(dg_dof[i],dgele_dof[k],value));
+		  } 	      
+		}
+	      }
 	    }
 	  }
 	}
     }
   }
-  
   stiff_matrix.setZero();
   stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
   std::cout << "Transparent boundary condition ... OK!"<<std::endl;
