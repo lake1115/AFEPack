@@ -29,8 +29,8 @@ cvaltype uiExperiment::get_u_hat(int n, int m)
     if(phi < 0)
       phi += 2*PI;
     cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
-    cvaltype cout = u_exact(point);
-    //cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
+    //cvaltype cout = u_exact(point);
+    cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
     u_hat += cout*std::conj(Y);  
   }
   u_hat = 4*PI*u_hat/M;
@@ -180,14 +180,10 @@ void uiExperiment::TransparentBC(int bmark)
     j++;
   }
 
-  cvaltype Theta,u_hat;
-  double theta,phi;
-  double theta2,phi2;
-  cvaltype Y,Y2;
   clock_t start,end;
   start = clock();
   for(int n = 0; n <= order; n++){
-    Theta = get_Theta(n);
+    cvaltype Theta = get_Theta(n);
     for(int m = -n; m <= n; m++){
       std::cout<<" n = "<<n <<" m = "<<m<< std::endl;
       // u_hat = get_u_hat(n,m);
@@ -219,13 +215,13 @@ void uiExperiment::TransparentBC(int bmark)
 	  int n_dgele_dof = dgele_dof.size();
 	  for(int l=0;l<n_q_pnt;l++){
 	    double Jxw = edgec.Jxw[l];
-	    theta = acos(q_pnt[l][2]/R);
-	    phi = atan2(q_pnt[l][1],q_pnt[l][0]);
+	    double theta = acos(q_pnt[l][2]/R);
+	    double phi = atan2(q_pnt[l][1],q_pnt[l][0]);
 	    if(phi < 0)
 	      phi += 2*PI;
 	    cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
 	    for(int j=0;j<n_dgele_dof;j++){
-	      u_hat = Jxw*bas_val[j][l]*std::conj(Y);
+	      cvaltype u_hat = Jxw*bas_val[j][l]*std::conj(Y);
 	      ///////////////////////////////  
 	      the_dgele2 = fem_space.beginDGElement();
 	      for (u_int t = 0;the_dgele2 != end_dgele;++the_dgele2,++t) 
@@ -239,12 +235,12 @@ void uiExperiment::TransparentBC(int bmark)
 
 		  for(int l2=0;l2<n_q_pnt2;l2++){
 		    double Jxw2 = edgec2.Jxw[l2];
-		    theta2 = acos(q_pnt2[l2][2]/R);
-		    phi2 = atan2(q_pnt2[l2][1],q_pnt2[l2][0]);
+		    double theta2 = acos(q_pnt2[l2][2]/R);
+		    double phi2 = atan2(q_pnt2[l2][1],q_pnt2[l2][0]);
 		    if(phi2 < 0)
 		      phi2 += 2*PI;
 	  
-		    Y2 = boost::math::spherical_harmonic(n,m,theta2,phi2);
+		    cvaltype Y2 = boost::math::spherical_harmonic(n,m,theta2,phi2);
 		    for(int k=0;k<n_dgele_dof2;k++){
 		      ///////////////////
 		      //  rhs(dgele_dof2[k]) += -1/R*Theta*u_hat*Y2*Jxw2*bas_val2[k][l2];
@@ -386,73 +382,119 @@ void uiExperiment::getIndicator()
   
   RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
   indicator.reinit(mesh);
-#if 1
-  FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
-  for(;the_ele!=end_ele;++the_ele){
-    const std::vector<int>& ele_dof = the_ele->dof();
-    const int& n_dof = ele_dof.size();
-    const int& ele_idx = the_ele->index();
-    for(int i = 0;i<n_dof;++i){
-      Point<DIM> p = fem_space.dofInfo(i).interp_point;
-      double norm = sqrt(u_re(ele_dof[i])*u_re(ele_dof[i])+u_im(ele_dof[i])*u_im(ele_dof[i]));
-      indicator[ele_idx] += 1./sqrt(1.+pow(norm,2.0));
-      //std::cout<<indicator[ele_idx]<<std::endl;
+
+  int n_face = mesh.n_geometry(DIM - 1);
+  std::vector<double> jump(n_face);
+
+  for(u_int k=0;k<edge_cache[0].size();k++){
+    EdgeCache<double,DIM>& edgec = edge_cache[0][k];
+    std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+    Element<double,DIM>* ele1 = edgec.p_neigh;
+    Element<double,DIM>* ele2 = edgec.p_neigh2;
+    const int& n_q_pnt = edgec.n_quad_pnt;
+    for(u_int l=0;l<n_q_pnt;l++){
+      double Jxw = edgec.Jxw[l];
+      std::vector<double> u_re_grad = u_re.gradient(q_pnt[l], *ele1);
+      std::vector<double> u_im_grad = u_im.gradient(q_pnt[l], *ele1);
+      std::vector<double> u_re_grad2 = u_re.gradient(q_pnt[l], *ele2);
+      std::vector<double> u_im_grad2 = u_im.gradient(q_pnt[l], *ele2);
+      std::vector<cvaltype> u_h_grad(DIM),u_h_grad2(DIM);
+      u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
+      u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];      
+      u_h_grad[2] = u_re_grad[2]+I*u_im_grad[2];      
+      u_h_grad2[0] = u_re_grad2[0]+I*u_im_grad2[0];
+      u_h_grad2[1] = u_re_grad2[1]+I*u_im_grad2[1];
+      u_h_grad2[2] = u_re_grad2[2]+I*u_im_grad2[2];
+      jump[edgec.idx] += Jxw*std::norm(((u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]+u_h_grad[2]*edgec.un[l][2])-(u_h_grad2[0]*edgec.un[l][0]+u_h_grad2[1]*edgec.un[l][1]+u_h_grad2[2]*edgec.un[l][2])));
     }
   }
+  std::cout<<"haha"<<std::endl;
+  //in Neumann boundary
+  for(u_int k=0;k<edge_cache[1].size();++k){
+    EdgeCache<double,DIM>& edgec = edge_cache[1][k];
+    std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+    Element<double,DIM>* ele = edgec.p_neigh;
+    const int& n_q_pnt = edgec.n_quad_pnt;
+    for(int l=0;l<n_q_pnt;l++){
+      double Jxw = edgec.Jxw[l];
+      std::vector<double> u_re_grad = u_re.gradient(q_pnt[l], *ele);
+      std::vector<double> u_im_grad = u_im.gradient(q_pnt[l], *ele);
+      std::vector<cvaltype> u_h_grad(DIM);
+      u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
+      u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];      
+      u_h_grad[2] = u_re_grad[2]+I*u_im_grad[2];      
+      cvaltype g_val = g(q_pnt[l]);
+      cvaltype a = (u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]+u_h_grad[2]*edgec.un[l][2]);
+      jump[edgec.idx] += Jxw*std::norm(2.0*(a-g_val));
+    }
+    //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
+  }
+  std::cout<<"haha2"<<std::endl;
+  //in Transparent boundary
+  for(int n=0;n<=order;n++){
+    for(int m=-n;m<=n;m++)
+      u_hat[n*(n+1)+m] = get_u_hat(n,m);
+  }
 
-#else
-  int n_face = mesh.n_geometry(DIM - 1);
-  std::vector<bool> flag(n_face,false);
-  std::vector<double> jump(n_face);
+  for(u_int k=0;k<edge_cache[2].size();++k){
+    EdgeCache<double,DIM>& edgec = edge_cache[2][k];
+    std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
+    Element<double,DIM>* ele = edgec.p_neigh;
+    const int& n_q_pnt = edgec.n_quad_pnt;
+    for(int l=0;l<n_q_pnt;l++){
+      double Jxw = edgec.Jxw[l];
+      std::vector<double> u_re_grad = u_re.gradient(q_pnt[l], *ele);
+      std::vector<double> u_im_grad = u_im.gradient(q_pnt[l], *ele);
+      std::vector<cvaltype> u_h_grad(2);
+      u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
+      u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];
+      cvaltype a = (u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]);
+      cvaltype T_val=0.0;
+      for(int n=0;n<=order;n++){
+	cvaltype Theta = get_Theta(n);
+	for(int m=-n;m<=n;m++){
+	  double theta = acos(q_pnt[l][2]/R);
+	  double phi = atan2(q_pnt[l][1],q_pnt[l][0]);
+	if(phi<0)
+	  phi += 2*PI;
+	cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi);
+	T_val += -1/R*Theta*u_hat[n*(n+1)+m]*Y;
+      }
+      jump[edgec.idx] += Jxw*std::norm(2.0*(a-T_val));
+    }
+    //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
+  }
+  std::cout<<"haha3"<<std::endl;
+ // once more cycle for calculate indicator
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space.beginElement(),
     end_ele = fem_space.endElement();
-  for(;the_ele!=end_ele; ++ the_ele)
-    {
-      GeometryBM& geo = the_ele->geometry();
-      for(int j=0; j<geo.n_boundary(); ++j)
-	{
-	  GeometryBM& bnd = mesh.geometry(DIM-1, geo.boundary(j));
-	  AFEPack::Point<DIM>& p0 = mesh.point(bnd.vertex(0));
-	  AFEPack::Point<DIM>& p1 = mesh.point(bnd.vertex(1));
-	  std::vector<double> u_h_grad = u_re.gradient(midpoint(p0,p1), *the_ele);
-	  double a = (u_h_grad[0]*(p0[1]-p1[1])+u_h_grad[1]*(p1[0]-p0[0]));
-	  if(flag[bnd.index()] == false)
-	    {
-	      jump[bnd.index()] = a;
-	      flag[bnd.index()] = true;
-	    }
-	  else
-	    {
-	      jump[bnd.index()] -= a;
-	      flag[bnd.index()] = false;
-	    }
-	}
-    }
-  the_ele = fem_space.beginElement();
   for(int i=0; the_ele!= end_ele; ++ the_ele, ++i)
     {
       GeometryBM& geo = the_ele->geometry();
-      indicator[i] = 0.0;
-      for(int j=0; j<geo.n_boundary(); ++j)
-	{
-	  GeometryBM& bnd = mesh.geometry(DIM-1,geo.boundary(j));
-	  if(flag[bnd.index()])
-	    continue;
-	  indicator[i] += jump[bnd.index()]*jump[bnd.index()];
-	}
-    }
-#endif
+      const int& ele_idx = the_ele->index();
+      ElementCache<double,DIM>& ec = element_cache[ele_idx];
+      // the residual
+      double A = ec.es*ec.residual;
+      double B = 0.0;
+      for(int j=0; j<geo.n_boundary(); ++j){
+	GeometryBM& bnd = mesh.geometry(DIM-1,geo.boundary(j));
+	B += 0.5*ec.es_list[j]*jump[bnd.index()];
+      }
+      indicator[i] = sqrt(A*A + B);
+      // std::cout<<" i= "<< the_ele->index()<< " indicator "<< indicator[i] <<std::endl; 
+    } 
+
+  }
+  
 }
 // read mesh file
 uiExperiment::uiExperiment(const std::string& file)
 {
   mesh_file = file;
   order = Order;
-  n_bmark = 2;
-  //u_hat.resize((order+1)*(order+1));
+  n_bmark = 3;
+  u_hat.resize((order+1)*(order+1));
 };
 
 uiExperiment::~uiExperiment()
@@ -560,7 +602,7 @@ void uiExperiment::buildFEMSpace()
   triplets.clear();
   
   std::cout << "Update Data Cache ...";
-  updateGeometryCache();
+  updateGeometryCache(1);
   std::cout << "OK!" << std::endl;
   // for record Neumman bc bmark
   edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
@@ -603,7 +645,7 @@ void uiExperiment::buildDGFEMSpace(int bmark)
   std::cout << " bmark: "<<bmark<<" ..."<< " surface: "<< n_dg_ele<<" ...";
   if(bmark_count == n_bmark)
     std::cerr<<"Error: not enough bmark number"<<std::endl;
-  updateDGGeometryCache(edge_cache[bmark_count]);
+  updateDGGeometryCache(edge_cache[bmark_count],1);
   std::cout << "OK!" << std::endl;
 
 }

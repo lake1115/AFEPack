@@ -11,9 +11,17 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   FEMSpace<double,DIM>& sp = ele.femSpace();
   Mesh<DIM>& mesh = sp.mesh();
   GeometryBM& geo = ele.geometry();
-  u_int n_bnd = geo.n_boundary();
   barycenter(mesh, geo, ec.bc);
 
+  elesize(mesh,geo,ec.es);
+  
+  u_int n_bnd = geo.n_boundary();
+  ec.es_list.resize(n_bnd);
+  for(u_int i = 0;i<n_bnd;i++){
+    GeometryBM& bnd_geo = mesh.geometry(DIM-1, geo.boundary(i));
+    elesize(mesh,bnd_geo,ec.es_list[i]);
+  }
+  
   double volume = ele.templateElement().volume(); 
   const QuadratureInfo<DIM>& quad_info = ele.findQuadratureInfo(alg_acc); 
   int& n_quad_pnt = ec.n_quad_pnt; 
