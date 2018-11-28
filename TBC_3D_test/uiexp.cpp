@@ -21,7 +21,6 @@ cvaltype uiExperiment::get_u_hat(int n, int m)
   double theta,phi;
   cvaltype u_hat = 0;
   double N = 1.0*n;
-  std::cout << "M = "<<M <<std::endl;
   for(int i = 0; i < M; i++){
     const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
     theta = acos(point[2]/R);
@@ -33,7 +32,7 @@ cvaltype uiExperiment::get_u_hat(int n, int m)
     cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
     u_hat += cout*std::conj(Y);  
   }
-  u_hat = 4*PI*u_hat/M;
+  u_hat = 4*PI*R*R*u_hat/M;
   return u_hat;
 }
 
@@ -187,23 +186,24 @@ void uiExperiment::TransparentBC(int bmark)
     for(int m = -n; m <= n; m++){
       std::cout<<" n = "<<n <<" m = "<<m<< std::endl;
       // u_hat = get_u_hat(n,m);
-      /*
+      /* 
 	for(int i=0; i<M; i++){
 	const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
-	theta = acos(point[2]/R);
-	phi = atan2(point[1],point[0]);
+	double theta = acos(point[2]/R);
+	double phi = atan2(point[1],point[0]);
 	if(phi < 0)
 	phi += 2*PI;
-	Y = boost::math::spherical_harmonic(n,m,theta,phi); 
-	u_hat = 4*PI/M*std::conj(Y);
+	cvaltype Y = boost::math::spherical_harmonic(n,m,theta,phi); 
+	cvaltype u_hat = 2*sqrt(2)/M*std::conj(Y);
       */
-
+      
       DGFEMSpace<double,DIM>::DGElementIterator
 	the_dgele = fem_space.beginDGElement(),
 	end_dgele = fem_space.endDGElement();
 
       DGFEMSpace<double,DIM>::DGElementIterator
 	the_dgele2 = fem_space.beginDGElement();
+      
       //////////////////////////////// 
       for (u_int i = 0; the_dgele != end_dgele; ++ the_dgele,++i)
 	{
@@ -223,6 +223,7 @@ void uiExperiment::TransparentBC(int bmark)
 	    for(int j=0;j<n_dgele_dof;j++){
 	      cvaltype u_hat = Jxw*bas_val[j][l]*std::conj(Y);
 	      ///////////////////////////////  
+	      
 	      the_dgele2 = fem_space.beginDGElement();
 	      for (u_int t = 0;the_dgele2 != end_dgele;++the_dgele2,++t) 
 		{
@@ -255,8 +256,9 @@ void uiExperiment::TransparentBC(int bmark)
 	    }
 	  }
 	}
+      
     }
-  }
+   }
   end = clock();
   std::cout<< " time: " << (double)(end-start)/CLOCKS_PER_SEC<<std::endl;
   stiff_matrix.setZero();
@@ -408,7 +410,6 @@ void uiExperiment::getIndicator()
       jump[edgec.idx] += Jxw*std::norm(((u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]+u_h_grad[2]*edgec.un[l][2])-(u_h_grad2[0]*edgec.un[l][0]+u_h_grad2[1]*edgec.un[l][1]+u_h_grad2[2]*edgec.un[l][2])));
     }
   }
-  std::cout<<"haha"<<std::endl;
   //in Neumann boundary
   for(u_int k=0;k<edge_cache[1].size();++k){
     EdgeCache<double,DIM>& edgec = edge_cache[1][k];
@@ -429,7 +430,6 @@ void uiExperiment::getIndicator()
     }
     //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
   }
-  std::cout<<"haha2"<<std::endl;
   //in Transparent boundary
   for(int n=0;n<=order;n++){
     for(int m=-n;m<=n;m++)
@@ -464,7 +464,6 @@ void uiExperiment::getIndicator()
     }
     //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
   }
-  std::cout<<"haha3"<<std::endl;
  // once more cycle for calculate indicator
   FEMSpace<double,DIM>::ElementIterator
     the_ele = fem_space.beginElement(),
@@ -482,7 +481,7 @@ void uiExperiment::getIndicator()
 	B += 0.5*ec.es_list[j]*jump[bnd.index()];
       }
       indicator[i] = sqrt(A*A + B);
-      // std::cout<<" i= "<< the_ele->index()<< " indicator "<< indicator[i] <<std::endl; 
+      //std::cout<<" i= "<< the_ele->index()<< " indicator "<< indicator[i] <<std::endl; 
     } 
 
   }
@@ -606,7 +605,7 @@ void uiExperiment::buildFEMSpace()
   std::cout << "OK!" << std::endl;
   // for record Neumman bc bmark
   edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
-
+  buildDGFEMSpace(0);
 }
 void uiExperiment::buildDGFEMSpace(int bmark)
 {
@@ -713,6 +712,7 @@ void uiExperiment::run()
     getError();
     saveData();
     getIndicator();
+    getError_h();
     adaptMesh();
     delete[] edge_cache;
     // edge_cache = NULL;

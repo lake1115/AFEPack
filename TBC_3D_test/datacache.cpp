@@ -13,13 +13,20 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   GeometryBM& geo = ele.geometry();
   barycenter(mesh, geo, ec.bc);
 
-  elesize(mesh,geo,ec.es);
-  
   u_int n_bnd = geo.n_boundary();
   ec.es_list.resize(n_bnd);
   for(u_int i = 0;i<n_bnd;i++){
     GeometryBM& bnd_geo = mesh.geometry(DIM-1, geo.boundary(i));
-    elesize(mesh,bnd_geo,ec.es_list[i]);
+    // get boundary geometry element size
+    Point<DIM>& p0 = mesh.point(bnd_geo.vertex(0));
+    Point<DIM>& p1 = mesh.point(bnd_geo.vertex(1));
+    Point<DIM>& p2 = mesh.point(bnd_geo.vertex(2));
+    double a = sqrt((p0[0]-p1[0])*(p0[0]-p1[0])+(p0[1]-p1[1])*(p0[1]-p1[1])+(p0[2]-p1[2])*(p0[2]-p1[2]));
+    double b = sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
+    double c = sqrt((p2[0]-p0[0])*(p2[0]-p0[0])+(p2[1]-p0[1])*(p2[1]-p0[1])+(p2[2]-p0[2])*(p2[2]-p0[2]));
+    double p = (a+b+c)/2.;
+    double area = sqrt(p*(p-a)*(p-b)*(p-c));
+    ec.es_list[i] = 2.*sqrt(area/PI);
   }
   
   double volume = ele.templateElement().volume(); 
@@ -37,6 +44,7 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
     Jxw = volume*jacobian[l]*quad_info.weight(l);
     ec.volume += Jxw;
   }
+  ec.es = 2.*pow(3/4./PI*ec.volume,1./3);
 }
 
 template <class value_type, int DIM, int DOW=DIM,int TDIM=DIM>
@@ -70,6 +78,7 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
     Jxw = volume*jacobian[l]*quad_info.weight(l);
     ec.volume += Jxw;
   }
+  ec.es = 2.*sqrt(1./PI*ec.volume);
 }
 
 void uiExperiment::updateGeometryCache(u_int alg_acc)
