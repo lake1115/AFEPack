@@ -29,7 +29,7 @@ const double lambda = 1;
 const double R = 2;
 const double r = 1;
 const double omega = kappa*C;
-const double Order = 3;
+const double Order = 5;
 
 //const vec_type val_0(0);
 #if example

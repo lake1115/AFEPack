@@ -17,29 +17,24 @@ cvaltype get_h(int n)
   return h;
 }
 
-cvaltype uiExperiment::get_u_hat(int n,cvaltype cout)
+cvaltype uiExperiment::get_u_hat(int n)
 {
-  // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i)) 
-  double M = 0;
+  // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i))
+  double M = dg_dof.size();
+  //double M = fem_space.n_DGElement();
   double theta;
   cvaltype u_hat = 0;
   double N = 1.0*n;
-  //cvaltype H_n = boost::math::cyl_hankel_1(0,kappa*R);
-  const u_int& n_dof = fem_space.n_dof();
-  for(int i = 0; i<n_dof; i++){
-    int bm = fem_space.dofInfo(i).boundary_mark;
-    if(bm != 2)
-      continue;
-    const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+  // std::cout<< " M = "<<M<<std::endl;
+  for(int i = 0; i< M ; i++){
+    const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
     theta = atan2(point[1],point[0]);
     if(theta < 0)
       theta += 2*PI;
-    //cvaltype u_ex = u_exact(point);
-    //u_hat += u_ex*exp(-1.0*I*N*theta);
+    cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
     u_hat += cout*exp(-1.0*I*N*theta);
-    M++;
   }
-  //u_hat = u_hat/M;
+  u_hat = u_hat/M;
   return u_hat;
 }
 
@@ -165,12 +160,19 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
 
 void uiExperiment::TransparentBC(int bmark)
 {
-  // don't need to use datacache, because each boundary treat independent and only use once.
   buildDGFEMSpace(bmark);
   if(fem_space.n_DGElement() == 0)
     return;
   double M = fem_space.n_DGElement();
-  //std::cout<<" M = "<<M<<std::endl;
+  
+  dg_dof.resize(M);
+  for(int i = 0,j = 0; i < fem_space.n_dof(); i++){
+    int bm = fem_space.dofInfo(i).boundary_mark;
+    if(bm != 2)
+      continue;
+    dg_dof[j] = i;
+    j++;
+  }
   cvaltype H,u_hat;
   double theta,theta2;
   clock_t start,end;
@@ -186,7 +188,7 @@ void uiExperiment::TransparentBC(int bmark)
     DGFEMSpace<double,DIM>::DGElementIterator
       the_dgele2 = fem_space.beginDGElement();
 
-    
+       
     for (u_int i = 0; the_dgele != end_dgele;++ the_dgele,++i) 
       {
 	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
@@ -204,20 +206,17 @@ void uiExperiment::TransparentBC(int bmark)
 	  for(int j=0;j<n_dgele_dof;j++){
 	    u_hat = Jxw*bas_val[j][l]*exp(-1.0*I*N*theta)/2.0/PI/R;
     
-    /*
+    
     /////////////////////
-    const u_int& n_dof = fem_space.n_dof();
-    for(int i = 0; i<n_dof; i++){
-      int bm = fem_space.dofInfo(i).boundary_mark;
-      if(bm != 2)
-	continue;
-      const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+    /* for(int i=0; i<M;i++){
+      const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
       theta = atan2(point[1],point[0]);
       if(theta < 0)
 	theta += 2*PI;
       u_hat = exp(-1.0*I*N*theta)/M; 
-    ////////////////////
     */
+    ////////////////////
+    
 	    the_dgele2 = fem_space.beginDGElement();
 	    for(u_int t = 0; the_dgele2 !=end_dgele;++the_dgele2,++t){
 	      EdgeCache<double,DIM>& edgec2 = edge_cache[bmark_count][t];
@@ -234,19 +233,15 @@ void uiExperiment::TransparentBC(int bmark)
 		for(int k=0;k<n_dgele_dof2;k++){
 		  cvaltype cout = Jxw2*exp(I*N*theta2)*bas_val2[k][l2];
 		  cvaltype value = -1/R*H*u_hat*cout;
-		  // cvaltype value = u_hat*cout;
-		  // I don't know why I calculate twice
-		  //  if(dgele_dof[j]!=dgele_dof2[k])
-		  // value = value /2.0;
-		   triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
-		  //triplets.push_back(T(i,dgele_dof2[k],value));
+		  triplets.push_back(T(dgele_dof[j],dgele_dof2[k],value));
+		  //triplets.push_back(T(dg_dof[i],dgele_dof2[k],value));
 		}
 	      }
 	    }	 
 	  }
 	}     	 
    }
-  }
+   }
   end = clock();
   std::cout<< " time: " << (double)(end-start)/CLOCKS_PER_SEC<<std::endl;
   stiff_matrix.setZero();
@@ -417,6 +412,9 @@ void uiExperiment::getIndicator()
     //std::cout<<" i= "<< edgec.idx<< " indicator "<< jump[edgec.idx] <<std::endl; 
   }
   //in Transparent boundary
+  for(int n=-order;n<=order;n++){
+    u_hat[n+order] = get_u_hat(n);
+  }
   for(u_int k=0;k<edge_cache[2].size();++k){
     EdgeCache<double,DIM>& edgec = edge_cache[2][k];
     std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
@@ -424,24 +422,21 @@ void uiExperiment::getIndicator()
     const int& n_q_pnt = edgec.n_quad_pnt;
     for(int l=0;l<n_q_pnt;l++){
       double Jxw = edgec.Jxw[l];
-      double u_re_val = u_re.value(q_pnt[l],*ele);
-      double u_im_val = u_im.value(q_pnt[l],*ele);
       std::vector<double> u_re_grad = u_re.gradient(q_pnt[l], *ele);
       std::vector<double> u_im_grad = u_im.gradient(q_pnt[l], *ele);
       std::vector<cvaltype> u_h_grad(2);
       u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
       u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];
       cvaltype a = (u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]);
-      cvaltype u_h_val(u_re_val,u_im_val);
+      
       cvaltype T_val=0.0;
       for(int n=-order;n<=order;n++){
 	cvaltype H = get_h(n);
 	double N = 1.0*n;
-	cvaltype u_hat = get_u_hat(n,u_h_val);
 	double theta = atan2(q_pnt[l][1],q_pnt[l][0]);
 	if(theta<0)
 	  theta += 2*PI;
-	T_val += 1/R*H*u_hat*exp(I*N*theta);
+	T_val += 1/R*H*u_hat[n+order]*exp(I*N*theta);
       }
       jump[edgec.idx] += Jxw*std::norm(2.0*(a-T_val));
     }
@@ -475,6 +470,7 @@ uiExperiment::uiExperiment(const std::string& file)
   mesh_file = file;
   order = Order;
   n_bmark = 3;
+  u_hat.resize(order*2+1);
 };
 
 uiExperiment::~uiExperiment()
@@ -571,7 +567,6 @@ void uiExperiment::buildFEMSpace()
   std::cout << "OK!" << std::endl;
   // for record Neumman bc bmark
   edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
-  // dg_dof = new std::vector<int>[n_bmark];
   buildDGFEMSpace(0);
   
 }
@@ -598,13 +593,11 @@ void uiExperiment::buildDGFEMSpace(int bmark)
       n_dg_ele +=1;
   }
 
-  //dg_dof[bmark_count].resize(n_dg_ele);
   // build DGElement
   fem_space.dgElement().resize(n_dg_ele);
   for(int i=0,j=0;i<n_side;i++){
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
       fem_space.dgElement(j).reinit(fem_space,i,0);
-      // dg_dof[bmark_count][j] = i;
       j += 1;
     }
   }
@@ -666,8 +659,8 @@ void uiExperiment::saveData()
   u_im.writeOpenDXData("u_im.dx");
   u_exact_re.writeOpenDXData("u_exact_re.dx");
   Error.writeOpenDXData("error.dx");
-  writeMatlabData("u_r.dat",u_re);
-  writeMatlabData("u_i.dat",u_im);
+  // writeMatlabData("u_r.dat",u_re);
+  //writeMatlabData("u_i.dat",u_im);
 };
 
 
@@ -681,7 +674,7 @@ void uiExperiment::run()
     getError();  
     saveData();
     getIndicator();
-    // getError_h();
+    getError_h();
     adaptMesh();
       
     getchar();
