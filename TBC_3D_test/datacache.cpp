@@ -44,7 +44,8 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
     Jxw = volume*jacobian[l]*quad_info.weight(l);
     ec.volume += Jxw;
   }
-  ec.es = 2.*pow(3/4./PI*ec.volume,1./3);
+  // volume is negtive! jacobian is wrong!
+  ec.es = 2.*pow(3/4./PI*std::abs(ec.volume),1./3);
 }
 
 template <class value_type, int DIM, int DOW=DIM,int TDIM=DIM>
@@ -78,7 +79,7 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
     Jxw = volume*jacobian[l]*quad_info.weight(l);
     ec.volume += Jxw;
   }
-  ec.es = 2.*sqrt(1./PI*ec.volume);
+  ec.es = 2.*sqrt(1./PI*std::abs(ec.volume));
 }
 
 void uiExperiment::updateGeometryCache(u_int alg_acc)

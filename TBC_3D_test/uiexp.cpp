@@ -481,6 +481,7 @@ void uiExperiment::getIndicator()
 	B += 0.5*ec.es_list[j]*jump[bnd.index()];
       }
       indicator[i] = sqrt(A*A + B);
+      
       //std::cout<<" i= "<< the_ele->index()<< " indicator "<< indicator[i] <<std::endl; 
     } 
 
