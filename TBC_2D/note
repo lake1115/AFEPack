@@ -1,32 +1,31 @@
-#############################################
-2018.5.1
+2019/2/16
 
-完成基本的robin边界条件
-#############################################
-2018.5.3
+*************************************
+usage:
 
-需要对复数helmholz方程处理
-有没有和dealii一样的向量有限元而不是用step-7里的方程组迭代求解
+2D cases:
+>> make
+>> easymesh D.d
+>> ./main D
 
-同一网格上的两个有限元空间自适应算法。class13_3 ，用IrregularMeshPair?
+3D cases:
+>> make
+>> ./main D.mesh
 
-#############################################
-2018.5.7
+*************************************
+extra dependent library:
 
-easymesh .n文件没有出现marker，而且EasyMesh 也不读入，如何判断多种材料
-#############################################
-2018.5.24
+Boost 1.48 (include bessel function, spherical harmonic function etc.)
+Eigen (for complex sparse matrix calculation)
 
-使用DGFEMSpace完成Neumman Boundary Condition, 先取消复数。
-#############################################
-2018.5.26
+*************************************
+rough way to get mesh:
 
-参考胡光辉老师的程序，实现vector Element，但是DGFEMSpace出错。
-#############################################
-2018.6.22
+2D cases:
+>> ./mesh refine_number r R 
 
-完成点单元复数矩阵运算。
-#############################################
-2018.10.15
+3D cases:
+>> gmsh D.geo
+>> gmsh2mesh D.msh
+>> ./addBoundaryMesh D.mesh D.mesh
 
-datacache中加入边外法向向量和边中点，测试证明结果和之前的差一个正负号，取模后相同。
