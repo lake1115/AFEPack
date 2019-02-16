@@ -40,6 +40,7 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   for (int l = 0;l < n_quad_pnt;l ++) {
     double& Jxw = ec.Jxw[l];
     Jxw = volume*jacobian[l]*quad_info.weight(l);
+    // std::cout<<" volume "<<volume << " jacobian "<< jacobian[l] << " weight "<<quad_info.weight(l)<<std::endl;
     ec.volume += Jxw; 
   }
 
@@ -84,12 +85,12 @@ void uiExperiment::updateGeometryCache(u_int alg_acc)
 {
   //u_int alg_acc = 3;
   
-  u_int n_ele = fem_space.n_element();
+  u_int n_ele = fem_space->n_element();
   element_cache.clear();
   element_cache.resize(n_ele);
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for(;the_ele != end_ele;++ the_ele){
     Element<double,DIM>& ele = *the_ele;
     const u_int& ele_idx = ele.index();
@@ -102,17 +103,18 @@ void uiExperiment::updateGeometryCache(u_int alg_acc)
 
 void uiExperiment::updateDGGeometryCache(std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc)
 {
-  u_int n_side = fem_space.n_DGElement();
+  u_int n_side = fem_space->n_DGElement();
   edge_cache.clear();
   edge_cache.resize(n_side);
   DGFEMSpace<double,DIM>::DGElementIterator
-    the_dgele = fem_space.beginDGElement(),
-    end_dgele = fem_space.endDGElement();
+    the_dgele = fem_space->beginDGElement(),
+    end_dgele = fem_space->endDGElement();
   for(u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i){
     DGElement<double,DIM>& edge = *the_dgele;
     const u_int& edge_idx = edge.index();
     EdgeCache<double,DIM>& ec = edge_cache[i];
     ec.idx = edge_idx;
+    
     updateEdgeGeometryInfo(edge, alg_acc, ec); 
     Element<double,DIM>* p_neigh = edge.p_neighbourElement(0);
     ec.basis_value = p_neigh->basis_function_value(ec.q_pnt);

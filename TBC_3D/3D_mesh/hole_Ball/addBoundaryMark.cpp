@@ -39,7 +39,8 @@ int main(int argc, char* argv[])
   mesh.readData(argv[1]);
   
   const int& n_pnt = mesh.n_point();
-
+	
+  int tbc_point = 0;
   for(int i = 0;i < n_pnt;++ i){
     GeometryBM& pnt_geo = mesh.geometry(0, i);
     Point<DIM>& pnt = mesh.point(i);
@@ -49,15 +50,16 @@ int main(int argc, char* argv[])
     }
     else if(onBoundary(pnt,i) == 2){
       pnt_geo.boundaryMark() = 2;
+	tbc_point++;
     }
     else{
       pnt_geo.boundaryMark() = 0;
     }
 
   }
-
+	
   std::cout << "boundary points are done..." << std::endl;
-  
+  std::cout << "TBC points = " << tbc_point<<std::endl;
   const int& n_line = mesh.n_geometry(1);
 
   for(int i = 0;i < n_line;++ i){

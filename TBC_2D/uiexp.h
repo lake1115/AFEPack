@@ -1,15 +1,11 @@
 #ifndef UIEXP_H
 #define UIEXP_H
 
-
-//#include "emdefs.h"
-
 const int DIM = 2;
 const int DOW = DIM;
 const int TDIM = DIM;
 const int vector_length = DIM; 
 
-//#include <AFEPack/AMGSolver.h>       
 #include <AFEPack/HGeometry.h>		 	
 #include <AFEPack/Geometry.h>
 #include <AFEPack/TemplateElement.h>
@@ -19,21 +15,8 @@ const int vector_length = DIM;
 #include <AFEPack/Functional.h>       
 #include <AFEPack/EasyMesh.h>
 #include <AFEPack/MovingMesh2D.h>
-//#include <AFEPack/SparseMatrixTool.h>
 
 #include <Eigen/Sparse>
-
-//#include <lac/vector.h>
-//#include <lac/vector_memory.h>
-//#include <lac/full_matrix.h>
-//#include <lac/sparse_matrix.h>
-//#include <lac/sparsity_pattern.h>
-//#include <lac/compressed_sparsity_pattern.h>
-//#include <lac/solver_cg.h>
-//#include <lac/precondition.h>
-//#include <lac/solver_bicgstab.h>
-//#include <lac/sparse_ilu.h>
-
 
 
 #include <string>
@@ -53,7 +36,8 @@ public:
 
  private:
  HGeometryTree<DIM> h_tree;
- IrregularMesh<DIM> ir_mesh;
+ IrregularMesh<DIM>* ir_mesh;
+ IrregularMesh<DIM>* old_ir_mesh;
  
  std::string mesh_file;		///mesh file
 
@@ -75,10 +59,12 @@ public:
  std::vector<TemplateElement<double,DIM,DIM>> template_element;
  std::vector<TemplateDGElement<DIM-1,DIM>> dg_template_element;
  
- DGFEMSpace<double,DIM> fem_space; /// finite element space
+ DGFEMSpace<double,DIM>* fem_space; /// finite element space
+ DGFEMSpace<double,DIM>* old_fem_space; 
 
  std::vector<ElementCache<double,DIM> > element_cache;
  std::vector<EdgeCache<double,DIM> >* edge_cache;
+ std::vector<EdgeCache<double,DIM> >* old_edge_cache;
  
  FEMFunction<double,DIM> u_re;    
  FEMFunction<double,DIM> u_im;    
@@ -86,13 +72,16 @@ public:
  FEMFunction<double,DIM> u_exact_re;
  FEMFunction<double,DIM> u_exact_im;
  
- FEMFunction<double,DIM> Error;
+ //FEMFunction<double,DIM> Error;
 
  
  Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> stiff_matrix;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> solution;
  Eigen::Matrix<cvaltype,Eigen::Dynamic,1> rhs;
 
+ Eigen::SparseVector<cvaltype> vec_u;
+ Eigen::SparseVector<cvaltype> vec_v;
+ 
  std::vector<T> triplets;
  
  Indicator<DIM> indicator;
@@ -107,7 +96,9 @@ public:
  std::vector<int> bmark_list;
 
  std::vector<int> dg_dof;
+ 
  std::vector<cvaltype> u_hat;
+ 
  public:
  uiExperiment(const std::string& file);
 

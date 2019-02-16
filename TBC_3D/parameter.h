@@ -23,13 +23,13 @@
  *
  *****************************************************************************
  */
-#define example 0
+#define example 1
 const double kappa = 1;
 const double lambda = 1;
-const double R = 2;
-const double r = 1;
+const double R = 1;
+const double r = 0.5;
 const double omega = kappa*C;
-const double Order = 5;
+const double Order = 1;
 
 //const vec_type val_0(0);
 #if example
@@ -77,19 +77,22 @@ cvaltype q(const double *p){
 }
 
 cvaltype g(const double *p){
+  double r = sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
   cvaltype dx = - (p[0]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[0]*exp(kappa*I*r))/(r*r);
   cvaltype dy = - (p[1]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[1]*exp(kappa*I*r))/(r*r);
   cvaltype dz = - (p[2]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[2]*exp(kappa*I*r))/(r*r);
 
-  cvaltype val= -p[0]*dx-p[1]*dy-p[2]*dz;
+  //cvaltype val= p[0]/r*dx+p[1]/r*dy+p[2]/r*dz;
+   cvaltype val= -p[0]/r*dx-p[1]/r*dy-p[2]/r*dz;
   return val;
 }
 
-cvaltype g1(const double *p){
-  double r = 2.0;
+cvaltype g2(const double *p){
+  double r = sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
   cvaltype d0 = - (p[0]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[0]*exp(kappa*I*r))/(r*r);
   cvaltype d1 = - (p[1]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[1]*exp(kappa*I*r))/(r*r);
   cvaltype d2 = - (p[2]*exp(kappa*I*r))/pow(r,3) + (kappa*I*p[2]*exp(kappa*I*r))/(r*r);
+  //cvaltype val= -p[0]/r*d0-p[1]/r*d1-p[2]/r*d2;
   cvaltype val= p[0]/r*d0+p[1]/r*d1+p[2]/r*d2;
   return val;
 }

@@ -80,6 +80,11 @@ cvaltype f(const double *p){
 
 }
 
+/*
+cvaltype f(const double *p){
+  return 0;
+}
+*/
 cvaltype q(const double *p){
   cvaltype val = 0;
 }

@@ -11,10 +11,25 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   FEMSpace<double,DIM>& sp = ele.femSpace();
   Mesh<DIM>& mesh = sp.mesh();
   GeometryBM& geo = ele.geometry();
-  u_int n_bnd = geo.n_boundary();
   barycenter(mesh, geo, ec.bc);
 
-  double volume = ele.templateElement().volume(); 
+  const u_int& n_bnd = geo.n_boundary();
+  ec.es_list.resize(n_bnd);
+  for(u_int i = 0;i<n_bnd;i++){
+    GeometryBM& bnd_geo = mesh.geometry(DIM-1, geo.boundary(i));
+    // get boundary geometry element size
+    Point<DIM>& p0 = mesh.point(bnd_geo.vertex(0));
+    Point<DIM>& p1 = mesh.point(bnd_geo.vertex(1));
+    Point<DIM>& p2 = mesh.point(bnd_geo.vertex(2));
+    double a = sqrt((p0[0]-p1[0])*(p0[0]-p1[0])+(p0[1]-p1[1])*(p0[1]-p1[1])+(p0[2]-p1[2])*(p0[2]-p1[2]));
+    double b = sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
+    double c = sqrt((p2[0]-p0[0])*(p2[0]-p0[0])+(p2[1]-p0[1])*(p2[1]-p0[1])+(p2[2]-p0[2])*(p2[2]-p0[2]));
+    double p = (a+b+c)/2.;
+    double area = sqrt(p*(p-a)*(p-b)*(p-c));
+    ec.es_list[i] = 2.*sqrt(area/PI);
+  }
+  
+  const double& volume = ele.templateElement().volume();
   const QuadratureInfo<DIM>& quad_info = ele.findQuadratureInfo(alg_acc); 
   int& n_quad_pnt = ec.n_quad_pnt; 
   n_quad_pnt = quad_info.n_quadraturePoint();
@@ -26,9 +41,13 @@ void updateElementGeometryInfo(Element<value_type,DIM>& ele,
   ec.Jxw.resize(n_quad_pnt);
   for (int l = 0;l < n_quad_pnt;l ++) {
     double& Jxw = ec.Jxw[l];
-    Jxw = volume*jacobian[l]*quad_info.weight(l);
+    //Jxw = volume*jacobian[l]*quad_info.weight(l);
+    Jxw = volume*std::abs(jacobian[l])*quad_info.weight(l);
     ec.volume += Jxw;
+    //std::cout<<" jacobian "<<jacobian[l]<<std::endl;
   }
+  // jacobian is negtive! jacobian is wrong when geometry is ball!
+  ec.es = 2.*pow(3/4./PI*std::abs(ec.volume),1./3);
 }
 
 template <class value_type, int DIM, int DOW=DIM,int TDIM=DIM>
@@ -44,7 +63,8 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
 
   barycenter(mesh, geo, ec.bc);
   
-  double volume = edge.templateElement().volume(); 
+  const double& volume = edge.templateElement().volume();
+  
   const QuadratureInfo<DIM-1>& quad_info = edge.findQuadratureInfo(alg_acc); 
   int& n_quad_pnt = ec.n_quad_pnt; 
   n_quad_pnt = quad_info.n_quadraturePoint();
@@ -59,22 +79,22 @@ void updateEdgeGeometryInfo(DGElement<value_type,DIM>& edge,
   
   for (int l = 0;l < n_quad_pnt;l ++) {
     double& Jxw = ec.Jxw[l];
-    Jxw = volume*jacobian[l]*quad_info.weight(l);
+    //Jxw = volume*jacobian[l]*quad_info.weight(l);
+    Jxw = volume*std::abs(jacobian[l])*quad_info.weight(l);
     ec.volume += Jxw;
   }
+  ec.es = 2.*sqrt(1./PI*std::abs(ec.volume));
 }
 
 void uiExperiment::updateGeometryCache(u_int alg_acc)
 {
-  //u_int alg_acc = 3;
-  
-  u_int n_ele = fem_space.n_element();
+  const u_int& n_ele = fem_space->n_element();
   element_cache.clear();
   element_cache.resize(n_ele);
   
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for(;the_ele != end_ele;++ the_ele){
     Element<double,DIM>& ele = *the_ele;
     const u_int& ele_idx = ele.index();
@@ -87,12 +107,12 @@ void uiExperiment::updateGeometryCache(u_int alg_acc)
 
 void uiExperiment::updateDGGeometryCache(std::vector<EdgeCache<double,DIM> >& edge_cache, u_int alg_acc)
 {
-  u_int n_side = fem_space.n_DGElement();
+  const u_int& n_side = fem_space->n_DGElement();
   edge_cache.clear();
   edge_cache.resize(n_side);
   DGFEMSpace<double,DIM>::DGElementIterator
-    the_dgele = fem_space.beginDGElement(),
-    end_dgele = fem_space.endDGElement();
+    the_dgele = fem_space->beginDGElement(),
+    end_dgele = fem_space->endDGElement();
   for(u_int i = 0;the_dgele != end_dgele;++ the_dgele,++i){
     DGElement<double,DIM>& edge = *the_dgele;
     const u_int& edge_idx = edge.index();

@@ -4,7 +4,7 @@ include /usr/local/AFEPack/Make.global_options
 
 source = $(wildcard *.cpp)
 object = $(patsubst %.cpp, %.o, $(source))
-LDFLAGS +=  -lAFEPack
+LDFLAGS +=  -lAFEPack -fopenmp
 
 all : main
 

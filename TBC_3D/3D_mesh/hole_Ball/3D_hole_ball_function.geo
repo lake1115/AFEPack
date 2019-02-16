@@ -1,5 +1,5 @@
 
-lc = 0.5;
+lc = 0.25;
 
 
 Function Ball
@@ -54,13 +54,13 @@ v1 = newv;
 Return
 
 
-x = 0 ; y = 0 ; z = 0 ; r = 2 ;
+x = 0 ; y = 0 ; z = 0 ; r = 1 ;
 
 
 For t In {0:1}
 	Call Ball;
 	Printf("Hole %g (center = {%g,%g,%g}, radius = %g) has number %g!",t, x, y, z, r, v1) ;
-	r -= 1;
+	r -= 0.5;
 	Physical Volume(t) = v1 ;
 EndFor
 

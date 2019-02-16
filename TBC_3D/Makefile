@@ -4,23 +4,22 @@ include /usr/local/AFEPack/Make.global_options
 
 source = $(wildcard *.cpp)
 object = $(patsubst %.cpp, %.o, $(source))
-LDFLAGS +=  -lAFEPack
+LDFLAGS +=  -lAFEPack -fopenmp
 
 all : main
 
 %.o : %.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@  
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 main : $(object)
 	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS)
 #	$(CXX) -o $@ $(object) $< $(CXXFLAGS)
-
-.PHONY : default clean
 
 clean :
 	-rm -rf $(object)
 	-rm -rf main
 	-rm -f *.[nes]
 	-rm -f *.dx
+	-rm -f *.dat
 
-
+.PHONY : default clean

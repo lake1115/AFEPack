@@ -16,7 +16,8 @@ template <int DIM>
 struct GeometryCache
 {
   double volume;
-  Point<DIM> bc; 
+  Point<DIM> bc;
+  double es;    /// element size
   int n_quad_pnt;
   std::vector<Point<DIM> > q_pnt;
   std::vector<double> Jxw;
@@ -38,11 +39,7 @@ struct ElementCache : public GeometryCache<DIM>
 {
   double ind;/// index of the element
   std::vector<Point<DIM> > bc_list;/// bary center list of all elements in the patch
-  
-  std::vector<Point<DIM> > bnd_mid_pnt_list;
-  std::vector<value_type> bnd_length_list;
-  std::vector<std::vector<value_type> > bnd_un_list;
-  double diameter;
+  std::vector<double> es_list; /// element size list of all elements in the patch
   
   std::vector<std::vector<value_type> > basis_value;
   std::vector<std::vector<std::vector<value_type> > > basis_gradient;
@@ -82,6 +79,5 @@ void barycenter(Mesh<DIM,DIM>& mesh,
     bc[2] = (p0[2] + p1[2] + p2[2] + p3[2])/4.;   
   }
 };
-
 
 #endif

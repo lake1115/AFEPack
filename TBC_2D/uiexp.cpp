@@ -1,6 +1,6 @@
 #include "uiexp.h"
 #include "parameter.h"
-#include <ctime>
+#include <chrono>
 
 cvaltype get_h(int n)
 {
@@ -17,17 +17,18 @@ cvaltype get_h(int n)
 
 cvaltype uiExperiment::get_u_hat(int n)
 {
-  // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i)) 
-  double M = fem_space.n_DGElement();
+  // /int_0^{2PI} f(x) = 2*PI/M*sum(f(x_i))
+  double M = dg_dof.size();
+  //double M = fem_space.n_DGElement();
   double theta;
   cvaltype u_hat = 0;
   double N = 1.0*n;
+  // std::cout<< " M = "<<M<<std::endl;
   for(int i = 0; i< M ; i++){
-    const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
+    const Point<DIM> point = fem_space->dofInfo(dg_dof[i]).interp_point;
     theta = atan2(point[1],point[0]);
     if(theta < 0)
       theta += 2*PI;
-    //cvaltype cout = u_exact(point);
     cvaltype cout = u_re(dg_dof[i]) + I*u_im(dg_dof[i]);
     u_hat += cout*exp(-1.0*I*N*theta);
   }
@@ -35,11 +36,12 @@ cvaltype uiExperiment::get_u_hat(int n)
   return u_hat;
 }
 
+
 void uiExperiment::getMat()
 {
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for (;the_ele != end_ele; ++ the_ele){
     const std::vector<int>& ele_dof = the_ele->dof();
     const int& n_ele_dof = ele_dof.size();
@@ -62,14 +64,14 @@ void uiExperiment::getMat()
       
     }
   }
-  stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
+  //stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
 }
 
 void uiExperiment::getRhs()
 {
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for (;the_ele != end_ele;++ the_ele) {
     const std::vector<int>& ele_dof = the_ele->dof();
     const int& n_ele_dof = ele_dof.size();
@@ -90,12 +92,12 @@ void uiExperiment::getRhs()
 }
 void uiExperiment::DirichletBC(CFunc bnd,int bmark)
 {
-  const u_int& n_dof = fem_space.n_dof();
+  const u_int& n_dof = fem_space->n_dof();
   for(u_int i = 0;i < n_dof;i++){
-    int bm = fem_space.dofInfo(i).boundary_mark;
+    int bm = fem_space->dofInfo(i).boundary_mark;
     if(bm != bmark)
       continue;
-    const Point<DIM> point = fem_space.dofInfo(i).interp_point;
+    const Point<DIM> point = fem_space->dofInfo(i).interp_point;
     // cvaltype bndVal = bnd(point);
     solution(i) = bnd(point);
     rhs(i) = stiff_matrix.diagonal()[i] * solution(i);
@@ -121,11 +123,11 @@ void uiExperiment::DirichletBC(CFunc bnd,int bmark)
 void uiExperiment::NeummanBC(CFunc g,int bmark)
 {
   buildDGFEMSpace(bmark);
-  if(fem_space.n_DGElement() == 0)
+  if(fem_space->n_DGElement() == 0)
     return;
   DGFEMSpace<double,DIM>::DGElementIterator
-    the_dgele = fem_space.beginDGElement(),
-    end_dgele = fem_space.endDGElement();
+    the_dgele = fem_space->beginDGElement(),
+    end_dgele = fem_space->endDGElement();
   for (u_int i = 0;the_dgele != end_dgele;++ the_dgele,++ i) 
     {
       //const u_int& edge_idx = the_dgele->index();
@@ -148,8 +150,6 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
 	}
       }
     }
-  stiff_matrix.setZero();
-  stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
   std::cout << "Neumman boundary condition ... OK!"<<std::endl;
 
 };
@@ -157,38 +157,39 @@ void uiExperiment::NeummanBC(CFunc g,int bmark)
 void uiExperiment::TransparentBC(int bmark)
 {
   buildDGFEMSpace(bmark);
-  if(fem_space.n_DGElement() == 0)
+  if(fem_space->n_DGElement() == 0)
     return;
-  double M = fem_space.n_DGElement();
+  Mesh<DIM>& mesh = fem_space->mesh();
+  const int& n_dof = fem_space->n_dof();
   
-  dg_dof.resize(M);
-  for(int i = 0,j = 0; i < fem_space.n_dof(); i++){
-    int bm = fem_space.dofInfo(i).boundary_mark;
+    double M = fem_space->n_DGElement();
+  
+    dg_dof.resize(M);
+    for(int i = 0,j = 0; i < fem_space->n_dof(); i++){
+    int bm = fem_space->dofInfo(i).boundary_mark;
     if(bm != 2)
-      continue;
+    continue;
     dg_dof[j] = i;
     j++;
-  }
-
+    }
+  
   cvaltype H,u_hat;
-  double theta;
+  double theta,theta2;
   for(int n=-order;n<=order;n++){
     std::cout<<" n = "<<n<<std::endl;
     H = get_h(n);
-    //u_hat = get_u_hat(n);
+    // cvaltype u_hat2 = get_u_hat(n,1);
     double N = 1.0*n;
-    for(int i=0; i<M;i++){
-      const Point<DIM> point = fem_space.dofInfo(dg_dof[i]).interp_point;
-      theta = atan2(point[1],point[0]);
-      if(theta < 0)
-	theta += 2*PI;
-      u_hat = exp(-1.0*I*N*theta)/M; 
+    DGFEMSpace<double,DIM>::DGElementIterator
+      the_dgele = fem_space->beginDGElement(),
+      end_dgele = fem_space->endDGElement();
 
-      DGFEMSpace<double,DIM>::DGElementIterator
-	the_dgele = fem_space.beginDGElement(),
-	end_dgele = fem_space.endDGElement();
-      for (u_int t = 0; the_dgele != end_dgele;++ the_dgele,++t){
-	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][t];
+    vec_u.setZero();
+    vec_v.setZero();
+
+    for (u_int i = 0; the_dgele != end_dgele;++ the_dgele,++i) 
+      {
+	EdgeCache<double,DIM>& edgec = edge_cache[bmark_count][i];
 	std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
 	const int& n_q_pnt = edgec.n_quad_pnt;
 	std::vector<std::vector<double> > bas_val = edgec.basis_value;
@@ -196,28 +197,25 @@ void uiExperiment::TransparentBC(int bmark)
 	int n_dgele_dof = dgele_dof.size();
 	for(int l=0;l<n_q_pnt;l++){
 	  double Jxw = edgec.Jxw[l];
-	  theta = atan2(q_pnt[l][1],q_pnt[l][0]);
-	  if(theta<0)
-	    theta += 2*PI;
+	  cvaltype zp(q_pnt[l][0]/R,q_pnt[l][1]/R);
 	  for(int j=0;j<n_dgele_dof;j++){
-	    ///////////////////
-	    //rhs(dgele_dof[j]) += 1/R*H*u_hat*exp(1.0*I*N*theta)*Jxw*bas_val[j][l];
-	    //////////////////
-	      cvaltype cout = Jxw*exp(I*N*theta)*bas_val[j][l];
-	      cvaltype value = -1/R*H*cout*u_hat;
-	      triplets.push_back(T(dg_dof[i],dgele_dof[j],value));
-	    } 
+	    vec_u.coeffRef(dgele_dof[j]) +=Jxw*bas_val[j][l]*std::pow(zp,-N)/2.0/PI/R;
+	    vec_v.coeffRef(dgele_dof[j]) +=Jxw*bas_val[j][l]*std::pow(zp,N);
 	  }
 	}
       }
+    
+    for(Eigen::SparseVector<cvaltype>::InnerIterator it_u(vec_u); it_u; ++it_u){
+      for(Eigen::SparseVector<cvaltype>::InnerIterator it_v(vec_v); it_v; ++it_v){
+	cvaltype cout = -1/R*H*it_u.value()*it_v.value();
+	triplets.push_back(T(it_u.index(),it_v.index(),cout));
+      }
+    }
   }
-  
-  stiff_matrix.setZero();
-  stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
   std::cout << "Transparent boundary condition ... OK!"<<std::endl;
 };
 
-
+/*
 void uiExperiment::getExactVal()
 {
   u_exact_re.reinit(fem_space);
@@ -231,7 +229,8 @@ void uiExperiment::getExactVal()
     
   }
 }
-
+*/
+/*
 void uiExperiment::getL1Error()
 {
   double L1error = 1E-9;
@@ -258,15 +257,15 @@ void uiExperiment::getL1Error()
   
   std::cerr << "\n1 error = " << L1error << std::endl;
 }
-
+*/
 void uiExperiment::getError()
 {  
   double L2error = 0;
   double L2error_grad = 0;
 
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for (;the_ele != end_ele; ++ the_ele){
     const std::vector<int>& ele_dof = the_ele->dof();
     const int& ele_idx = the_ele->index();
@@ -308,7 +307,7 @@ void uiExperiment::getError()
 
 void uiExperiment::getError_h()
 {
-  RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
+  RegularMesh<DIM>& mesh = ir_mesh->regularMesh();
   u_int n_ele = mesh.n_geometry(DIM);
   double error_h = 0.0;
   for(u_int i=0;i<n_ele;i++){
@@ -321,17 +320,34 @@ void uiExperiment::getError_h()
 void uiExperiment::adaptMesh()
 {
   std::cout<<"********** Begin Adapt Mesh **********"<<std::endl;
-  mesh_adaptor.reinit(ir_mesh);
-  mesh_adaptor.convergenceOrder() = 0;
-  mesh_adaptor.refineStep() = 0;
+  old_ir_mesh = ir_mesh;
+  ir_mesh = new IrregularMesh<DIM>(*old_ir_mesh);
+  
+  mesh_adaptor.reinit(*old_ir_mesh,*ir_mesh);
   mesh_adaptor.setIndicator(indicator);
-  mesh_adaptor.tolerence() = 0.0008;
+  mesh_adaptor.tolerence() = 1.0e-6;
+  mesh_adaptor.convergenceOrder() = 2;
+  mesh_adaptor.refineStep() = 1;
+  
   mesh_adaptor.adapt();
+
+  ir_mesh->semiregularize();
+  ir_mesh->regularize(false);
+
+  /// build the new space
+  old_fem_space = fem_space;
+  old_edge_cache = edge_cache;
+  buildFEMSpace();
+  /// release memory
+  delete old_ir_mesh;
+  delete old_fem_space;
+  delete[] old_edge_cache;
+
 }
 void uiExperiment::getIndicator()
 {
   
-  RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
+  RegularMesh<DIM>& mesh = ir_mesh->regularMesh();
   indicator.reinit(mesh);
 
   int n_face = mesh.n_geometry(DIM - 1);
@@ -382,7 +398,6 @@ void uiExperiment::getIndicator()
   for(int n=-order;n<=order;n++){
     u_hat[n+order] = get_u_hat(n);
   }
-
   for(u_int k=0;k<edge_cache[2].size();++k){
     EdgeCache<double,DIM>& edgec = edge_cache[2][k];
     std::vector<Point<DIM> >& q_pnt = edgec.q_pnt;
@@ -396,6 +411,7 @@ void uiExperiment::getIndicator()
       u_h_grad[0] = u_re_grad[0]+I*u_im_grad[0];
       u_h_grad[1] = u_re_grad[1]+I*u_im_grad[1];
       cvaltype a = (u_h_grad[0]*edgec.un[l][0]+u_h_grad[1]*edgec.un[l][1]);
+      
       cvaltype T_val=0.0;
       for(int n=-order;n<=order;n++){
 	cvaltype H = get_h(n);
@@ -412,8 +428,8 @@ void uiExperiment::getIndicator()
 	      
   // once more cycle for calculate indicator
   FEMSpace<double,DIM>::ElementIterator
-    the_ele = fem_space.beginElement(),
-    end_ele = fem_space.endElement();
+    the_ele = fem_space->beginElement(),
+    end_ele = fem_space->endElement();
   for(int i=0; the_ele!= end_ele; ++ the_ele, ++i)
     {
       GeometryBM& geo = the_ele->geometry();
@@ -446,10 +462,12 @@ uiExperiment::~uiExperiment()
 void uiExperiment::init()
 {
   //change mesh data to local mesh data
-  //h_tree.readMesh(mesh_file);
   h_tree.readEasyMesh(mesh_file);
-  ir_mesh.reinit(h_tree);
-  // ir_mesh.globalRefine(2);
+  ir_mesh = new IrregularMesh<DIM>(h_tree);
+  ir_mesh->globalRefine(0);
+  ir_mesh->semiregularize();
+  ir_mesh->regularize(false);
+
     
   // read the triangle template
   triangle_template_geometry.readData("triangle.tmp_geo");
@@ -488,53 +506,55 @@ void uiExperiment::init()
   dg_template_element.resize(1);
   dg_template_element[0].reinit(interval_template_geometry,interval_to2d_coord_transform);
   
-  
+  buildFEMSpace();
   std::cout << "********** Initialize Complete **********" << std::endl;
 }
 
 
 // build FEMSpace
 void uiExperiment::buildFEMSpace()
-{
-  ir_mesh.semiregularize();
-  ir_mesh.regularize(false);
-  
-  RegularMesh<DIM>& mesh = ir_mesh.regularMesh();
+{  
+  RegularMesh<DIM>& mesh = ir_mesh->regularMesh();
   // renew FEMspace
-  fem_space.reinit(mesh,template_element,dg_template_element);
+  fem_space = new DGFEMSpace<double, DIM>(mesh,template_element,dg_template_element);
 
-  u_int n_element = mesh.n_geometry(DIM);
-  fem_space.element().resize(n_element);
+
+  const u_int& n_element = mesh.n_geometry(DIM);
+  fem_space->element().resize(n_element);
+  
+#pragma omp parallel for  
   for(int i=0; i<n_element; i++){
     // if vertex is 3, use triangle, else use twin triangle 
     int n_vtx = mesh.geometry(DIM,i).n_vertex();
     if(n_vtx == 3)
-      fem_space.element(i).reinit(fem_space,i,0);
+      fem_space->element(i).reinit(*fem_space,i,0);
     else if(n_vtx == 4)
-      fem_space.element(i).reinit(fem_space,i,1);
+      fem_space->element(i).reinit(*fem_space,i,1);
     else{
       std::cerr<<"Error: the number of vertex is wrong"<<std::endl;
     }
   }
-  fem_space.buildElement();
-  fem_space.buildDof();
-  fem_space.buildDofBoundaryMark();
+  fem_space->buildElement();
+  fem_space->buildDof();
+  fem_space->buildDofBoundaryMark();
   
-  u_re.reinit(fem_space);
-  u_im.reinit(fem_space);
+  u_re.reinit(*fem_space);
+  u_im.reinit(*fem_space);
 
-  const int& n_dof = fem_space.n_dof();
+  const int& n_dof = fem_space->n_dof();
   stiff_matrix.resize(n_dof,n_dof);
   rhs.setZero(n_dof);
   solution.setZero(n_dof);
   triplets.clear();
+
+  vec_u.resize(n_dof);
+  vec_v.resize(n_dof);
   
   std::cout << "Update Data Cache ...";
-  updateGeometryCache();
+  updateGeometryCache(3);
   std::cout << "OK!" << std::endl;
   // for record Neumman bc bmark
   edge_cache = new std::vector<EdgeCache<double,DIM> >[n_bmark];
-
   buildDGFEMSpace(0);
   
 }
@@ -551,31 +571,31 @@ void uiExperiment::buildDGFEMSpace(int bmark)
     bmark_count = pos;
   }
   
-  Mesh<DIM,DIM>& mesh = fem_space.mesh();
+  Mesh<DIM,DIM>& mesh = fem_space->mesh();
   // calculate Neumann boundary number
-  int n_side = mesh.n_geometry(DIM-1);
+  const int& n_side = mesh.n_geometry(DIM-1);
   int n_dg_ele = 0;
   for(int i=0;i<n_side;i++){
     // here only for mark=2 
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark)
-      n_dg_ele +=1;
+      n_dg_ele ++;
   }
 
   // build DGElement
-  fem_space.dgElement().resize(n_dg_ele);
+  fem_space->dgElement().resize(n_dg_ele);
   for(int i=0,j=0;i<n_side;i++){
     if(mesh.geometry(DIM-1,i).boundaryMark() == bmark){
-      fem_space.dgElement(j).reinit(fem_space,i,0);
-      j += 1;
+      fem_space->dgElement(j).reinit(*fem_space,i,0);
+      j ++;
     }
   }
-  fem_space.buildDGElement();
+  fem_space->buildDGElement();
   
   std::cout << "Update DG Data Cache ...";
   std::cout << " bmark: "<<bmark<<" ..."<< " side: "<< n_dg_ele<<" ...";
   if(bmark_count == n_bmark)
     std::cerr<<"Error: not enough bmark number"<<std::endl;
-  updateDGGeometryCache(edge_cache[bmark_count]);
+  updateDGGeometryCache(edge_cache[bmark_count],3);
   std::cout << "OK!" << std::endl;
 }
 
@@ -589,15 +609,27 @@ void uiExperiment::solve()
 
   TransparentBC(2);
   
-  //DirichletBC(bnd,2);
-  //NeummanBC(g1,2);
-  //DirichletBC(bnd,1);
-  Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
+  stiff_matrix.setFromTriplets(triplets.begin(),triplets.end());
 
+  std::chrono::time_point<std::chrono::system_clock> start, end;
+  start = std::chrono::system_clock::now();
+
+#if 1
+  std::cout <<" Begin solve linear system by BiCGstab with "<< Eigen::nbThreads() <<" Threads "<< std::endl;
+  //Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor> > Eigen_solver;
+  Eigen::BiCGSTAB<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor>,Eigen::IncompleteLUT<cvaltype> > Eigen_solver;
   Eigen_solver.compute(stiff_matrix);
   solution = Eigen_solver.solve(rhs);
-
-  for(int i=0;i<fem_space.n_dof();i++){
+#else
+  Eigen::ConjugateGradient<Eigen::SparseMatrix<cvaltype,Eigen::RowMajor>,Eigen::Lower|Eigen::Upper> Eigen_solver;
+  Eigen_solver.compute(stiff_matrix);
+  solution = Eigen_solver.solve(rhs);
+#endif
+  end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  //end = clock();
+  std::cout<< "Solve time: " << elapsed_seconds.count() <<std::endl;
+  for(int i=0;i<fem_space->n_dof();i++){
     cvaltype value = solution(i);
     u_re(i) = value.real();
     u_im(i) = value.imag();
@@ -606,7 +638,7 @@ void uiExperiment::solve()
   
 
 };
-
+/*
 void writeMatlabData(const std::string& filename, FEMFunction<double,DIM> u_h)
 {
   std::fstream file;
@@ -620,14 +652,14 @@ void writeMatlabData(const std::string& filename, FEMFunction<double,DIM> u_h)
   file.close();
 
 }
-
+*/
 void uiExperiment::saveData()
 {
   u_re.writeOpenDXData("u_re.dx");
   u_im.writeOpenDXData("u_im.dx");
-  u_exact_re.writeOpenDXData("u_exact_re.dx");
-  Error.writeOpenDXData("error.dx");
-  //writeMatlabData("u_r.dat",u_re);
+  // u_exact_re.writeOpenDXData("u_exact_re.dx");
+  //Error.writeOpenDXData("error.dx");
+  // writeMatlabData("u_r.dat",u_re);
   //writeMatlabData("u_i.dat",u_im);
 };
 
@@ -636,11 +668,10 @@ void uiExperiment::run()
 {
   init();
   do{
-    buildFEMSpace();
     solve();
-    getExactVal();
     getError();  
     saveData();
+    
     getIndicator();
     getError_h();
     adaptMesh();
