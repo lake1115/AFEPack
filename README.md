@@ -38,6 +38,11 @@ sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 
 # AFEPack运行
 
+在.bashrc中增加AFEPack path
+
+export AFEPACK_PATH="/usr/local/AFEPack"
+export AFEPACK_TEMPLATE_PATH="$AFEPACK_PATH/template/triangle:$AFEPACK_PATH/template/twin_triangle:$AFEPACK_PATH/template/interval:$AFEPACK_PATH/template/tetrahedron:$AFEPACK_PATH/template/twin_tetrahedron:$AFEPACK_PATH/template/four_tetrahedron"
+
 make
 easymesh D.d
 ./main D
