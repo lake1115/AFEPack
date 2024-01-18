@@ -2,7 +2,7 @@
 
 安装AFEPack 请参考https://github.com/wangheyu/AFEPack/tree/master
 
-Boost-1.50.0
+# Boost-1.50.0
 
 * 遇到error: invalid conversion from ‘const void*’ to ‘void*’ [-fpermissive]
 
@@ -19,7 +19,7 @@ Using python : 2.7 : /usr/include/python2.7 ;
 然后执行
 ./bootstrap.sh --with-python=python2.7
 
-Deal.II-8.1.0
+# Deal.II-8.1.0
 
 tar -xzf dealii-8.1.0.tar.gz
 cd deal.II
@@ -36,7 +36,7 @@ sudo make install
 设置一下deal.ii的库链接：
 sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 
-AFEPack运行
+# AFEPack运行
 
 make
 easymesh D.d
