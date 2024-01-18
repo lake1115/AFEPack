@@ -1,4 +1,4 @@
-![image](https://github.com/lake1115/AFEPack/assets/44112244/c89c8c9b-da5f-4bf2-b338-a5ce2efc5318)![image](https://github.com/lake1115/AFEPack/assets/44112244/c0e0ba66-cf00-4cc8-94ff-dfe7258c7084)# AFEPack for TBC
+# AFEPack for TBC
 
 安装AFEPack 请参考https://github.com/wangheyu/AFEPack/tree/master
 
