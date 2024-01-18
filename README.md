@@ -31,6 +31,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/dealii-8.1.0 -DDEAL_II_WITH_MPI=on -DDEA
 
 这里注意不要打开anaconda环境，不然会默认调用anaconda下cmake的boost-1.73.0
 make
+
 sudo make install
 
 设置一下deal.ii的库链接：
@@ -41,9 +42,12 @@ sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 在.bashrc中增加AFEPack path
 
 export AFEPACK_PATH="/usr/local/AFEPack"
+
 export AFEPACK_TEMPLATE_PATH="$AFEPACK_PATH/template/triangle:$AFEPACK_PATH/template/twin_triangle:$AFEPACK_PATH/template/interval:$AFEPACK_PATH/template/tetrahedron:$AFEPACK_PATH/template/twin_tetrahedron:$AFEPACK_PATH/template/four_tetrahedron"
 
 make
+
 easymesh D.d
+
 ./main D
 
