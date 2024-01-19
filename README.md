@@ -35,6 +35,8 @@ Using python : 2.7 : /usr/include/python2.7 ;
 然后执行
 ```
 ./bootstrap.sh --with-python=python2.7
+./b2
+sudo ./b2 install
 ```
 **Deal.II-8.1.0**
 ```
