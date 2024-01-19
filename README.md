@@ -51,8 +51,17 @@ sudo make install
 sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 ```
 **AFEPack**
+```
+cd /usr/local/AFEPack
+aclocal
+autoconf
+automake
+CC="/usr/bin/mpicc" CXX="/usr/bin/mpic++" CFLAGS="-I/usr/include/trilinos" CPPFLAGS="-I/usr/include/trilinos" CXXFLAGS="-I/usr/include/trilinos" ./configure --with-dealii="/usr/local/dealii-8.1.0"
+make
+sudo make install
+```
 
-在.bashrc中增加AFEPack path
+需要在.bashrc中增加AFEPack path
 ```
 export AFEPACK_PATH="/usr/local/AFEPack"
 export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
