@@ -7,10 +7,16 @@
  2. [运行AFEPack](#运行AFEPack)
 
 ## 安装AFEPack
-具体请参考https://github.com/wangheyu/AFEPack/tree/master， 非常详细。下面对一些可能的问题做补充
+具体请参考https://github.com/wangheyu/AFEPack/tree/master， 非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
 
 **Boost-1.50.0**
-
+```
+wget https://phoenixnap.dl.sourceforge.net/project/boost/boost/1.50.0/boost_1_50_0.tar.bz2
+tar -xjf boost_1_50_0.tar.bz2
+cd boost_1_50_0 && ./bootstrap.sh --prefix=/path/to/install
+./b2
+sudo ./b2 install
+```
 - 遇到error: invalid conversion from ‘const void*’ to ‘void*’ [-fpermissive]
 
 需要修改文件boost/libs/locale/src/icu/formatter.cpp
