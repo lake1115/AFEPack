@@ -29,21 +29,17 @@ Using python : 2.7 : /usr/include/python2.7 ;
 **Deal.II-8.1.0**
 ```
 tar -xzf dealii-8.1.0.tar.gz
-
 cd deal.II
-
 mkdir build && cd build
 ```
 根据 boost 安装路径修改
 ```
 export BOOST_DIR=/path/to/boost/install
-
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local/dealii-8.1.0 -DDEAL_II_WITH_MPI=on -DDEAL_II_WITH_THREADS=off -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -DCMAKE_Fortran_COMPILER=/usr/bin/mpifort -DDEAL_II_WITH_PETSC=OFF -DHDF5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi ..
 ```
 这里注意不要打开anaconda环境，不然会默认调用anaconda下cmake的boost-1.73.0
 ```
 make
-
 sudo make install
 ```
 设置一下deal.ii的库链接：
@@ -55,9 +51,7 @@ sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 在.bashrc中增加AFEPack path
 ```
 export AFEPACK_PATH="/usr/local/AFEPack"
-
 export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-
 export AFEPACK_TEMPLATE_PATH="$AFEPACK_PATH/template/triangle:$AFEPACK_PATH/template/twin_triangle:$AFEPACK_PATH/template/interval:$AFEPACK_PATH/template/tetrahedron:$AFEPACK_PATH/template/twin_tetrahedron:$AFEPACK_PATH/template/four_tetrahedron"
 ```
 
@@ -65,8 +59,6 @@ export AFEPACK_TEMPLATE_PATH="$AFEPACK_PATH/template/triangle:$AFEPACK_PATH/temp
 运行按如下步骤实现
 ```
 make
-
 easymesh D.d
-
 ./main D
 ```
