@@ -2,6 +2,10 @@
 
 ==============================
 
+## Table of contents
+ 1. [安装AFEPack](#安装AFEPack)
+ 2. [运行AFEPack](#运行AFEPack)
+
 ## 安装AFEPack
 具体请参考https://github.com/wangheyu/AFEPack/tree/master， 非常详细。下面对一些可能的问题做补充
 
