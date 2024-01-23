@@ -5,6 +5,7 @@
 ## Table of contents
  1. [安装AFEPack](#安装AFEPack)
  2. [运行AFEPack](#运行AFEPack)
+ 3. [调试AFEPack](#调试AFEPack)
 
 ## 安装AFEPack
 具体请参考https://github.com/wangheyu/AFEPack/tree/master， 非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
@@ -83,3 +84,8 @@ make
 easymesh D.d
 ./main D
 ```
+
+## 调试AFEPack
+主要通过vscode来调试代码。需要在vscode扩展中安装C/C++ 和C/C++ Extension Pack
+
+在.vscode中放入vscode文件夹下的launch.json, task.json, c_cpp_properties.json 即可
