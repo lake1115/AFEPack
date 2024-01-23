@@ -84,6 +84,10 @@ make
 easymesh D.d
 ./main D
 ```
+结果可以通过opendx来看， Ubuntu 通过sudo apt install dx dxsample 安装
+
+终端运行dx，打开界面，然后在Import Data...中选择运行结果u.dx文件，得到可视化结果
+
 
 ## 调试AFEPack
 主要通过vscode来调试代码。需要在vscode扩展中安装C/C++ 和C/C++ Extension Pack
