@@ -8,7 +8,7 @@
  3. [调试AFEPack](#调试AFEPack)
 
 ## 安装AFEPack
-具体请参考https://github.com/wangheyu/AFEPack/tree/master， 非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
+具体请参考https://github.com/wangheyu/AFEPack/tree/master  非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
 
 **Boost-1.50.0**
 ```
