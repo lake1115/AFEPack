@@ -10,6 +10,12 @@
 ## 安装AFEPack
 具体请参考https://github.com/wangheyu/AFEPack/tree/master  非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
 
+首先安装如下依赖
+```
+sudo apt-get install cmake g++ gcc automake autoconf mpich
+sudo apt-get install liblapack-dev libboost-all-dev libtbb-dev
+sudo apt-get install libmumps-dev trilinos-all-dev libsuitesparse-dev libarpack2-dev
+```
 **Boost-1.50.0**
 ```
 wget https://phoenixnap.dl.sourceforge.net/project/boost/boost/1.50.0/boost_1_50_0.tar.bz2
@@ -20,10 +26,9 @@ sudo ./b2 install
 ```
 - 遇到error: invalid conversion from ‘const void*’ to ‘void*’ [-fpermissive]
 
-需要修改文件boost/libs/locale/src/icu/formatter.cpp
+在boost/libs/locale/src/icu/formatter.cpp, 61行处:
 ```
-61行处： icu_fmt_->format(value,tmp); 改为
- icu_fmt_->format(::int64_t(value),tmp);
+icu_fmt_->format(value,tmp); -> icu_fmt_->format(::int64_t(value),tmp);
 ```
 - 提示找不到pyconfig.h
   
@@ -44,6 +49,14 @@ sudo ./b2 install
 tar -xzf dealii-8.1.0.tar.gz
 cd deal.II
 mkdir build && cd build
+```
+在deal.II/include/deal.II/lac/sparsity_pattern.h, 在最开始增加一行：
+```
+#include <algorithm>
+```
+在deal.II/source/base/parameter_handler.cc, line 1278, 如下修改：
+```
+return (p.get_optionalstd::string("value")); -> return bool(p.get_optionalstd::string("value"));
 ```
 根据 boost 安装路径修改
 ```
