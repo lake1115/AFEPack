@@ -8,7 +8,7 @@
  3. [调试AFEPack](#调试AFEPack)
 
 ## 安装AFEPack
-具体请参考https://github.com/wangheyu/AFEPack/tree/master  非常详细。目前在Ubuntu 18.04上测试过，下面对一些可能的问题做补充
+具体请参考https://github.com/wangheyu/AFEPack/tree/master  非常详细。目前在Ubuntu 22.04上测试过，下面对一些可能的问题做补充
 
 首先安装如下依赖
 ```
@@ -129,6 +129,7 @@ sudo make install
 ```
 
 - deal.II依然出现'numeric_limits' is not a member of 'std'问题:
+  
 在/usr/local/dealii-8.1.0/include/deal.II/lac/solver_gmres.h, 加入一行：
 ```
 #include <limits>
