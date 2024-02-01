@@ -62,10 +62,7 @@ mkdir build && cd build
 ```
 #include <algorithm>
 ```
-在deal.II/source/base/parameter_handler.cc, line 1278, 如下修改：
-```
-return (p.get_optionalstd::string("value")); -> return bool(p.get_optionalstd::string("value"));
-```
+
 根据 boost 安装路径修改
 ```
 export BOOST_DIR=/path/to/boost/install //默认是在/usr/
