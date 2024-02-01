@@ -17,13 +17,13 @@ sudo apt-get install liblapack-dev libboost-all-dev libtbb-dev libbz2-dev
 sudo apt-get install libmumps-dev trilinos-all-dev libsuitesparse-dev libarpack2-dev
 ```
 
-做如下链接修改， 这里不确定这样做是否最好， 但至少可以继续下去。 （或者定义到你自己指定的一个目录下） 
+做如下链接修改， 这里不确定这样做是否最好， 但至少可以继续下去。 （或者定义到你自己指定的一个目录下）,注意先check一下源文件是否存在，可能名称不太一样 
 ```
 sudo ln -s /usr/lib/x86_64-linux-gnu/libscalapack-openmpi.so /usr/local/lib/libscalapack.so
-sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotch-6.so /usr/lib/x86_64-linux-gnu/libptscotch.so
-sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotcherr-6.so /usr/lib/x86_64-linux-gnu/libptscotcherr.so
-sudo ln -s /usr/lib/x86_64-linux-gnu/libscotch-6.so /usr/lib/x86_64-linux-gnu/libscotch.so
-sudo ln -s /usr/lib/x86_64-linux-gnu/libscotcherr-6.so /usr/lib/x86_64-linux-gnu/libscotcherr.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotch-6.1.3.so /usr/lib/x86_64-linux-gnu/libptscotch.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotcherr-6.1.3.so /usr/lib/x86_64-linux-gnu/libptscotcherr.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libscotch-6.1.3.so /usr/lib/x86_64-linux-gnu/libscotch.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libscotcherr-6.1.3.so /usr/lib/x86_64-linux-gnu/libscotcherr.so
 ```
 
 **Boost-1.50.0**
