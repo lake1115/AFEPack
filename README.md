@@ -63,18 +63,27 @@ mkdir build && cd build
 #include <algorithm>
 ```
 
-根据 boost 安装路径修改
+1.根据 boost 安装路径修改
 ```
-export BOOST_DIR=/path/to/boost/install //默认是在/usr/
+export BOOST_DIR=/path/to/boost/install //默认是在/usr/local/include下
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local/dealii-8.1.0 -DDEAL_II_WITH_MPI=on -DDEAL_II_WITH_THREADS=off -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -DCMAKE_Fortran_COMPILER=/usr/bin/mpifort -DDEAL_II_WITH_PETSC=OFF -DHDF5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi ..
 ```
 - 提示调用系统或者anaconda下cmake的高版本boost，导致找不到安装的boost-1.50
 
-在CMakeList.txt, line 3, 插入：
+在deal.II/cmake/configure/configure_boost.cmake, line 63, 插入：
 ```
-cmake_policy(SET CMP0057 NEW)
+set(BOOST_ROOT "/usr/local/include")
+set(Boost_NO_SYSTEM_PATHS ON) 
+FIND_PACKAGE(Boost 1.50 COMPONENTS ${_boost_components})
 ```
- 
+为了验证可以在最后插入:
+```
+MESSAGE( STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}.")
+MESSAGE( STATUS "Boost_LIBRARIES = ${Boost_LIBRARIES}.")
+MESSAGE( STATUS "Boost_LIB_VERSION = ${Boost_LIB_VERSION}.")
+```
+
+2. make
 ```
 make
 sudo make install
@@ -102,7 +111,7 @@ ierr = MPI_Type_struct(2, lengths, displacements, types, &type); -> ierr = MPI_T
 return (p.get_optionalstd::string("value")); -> return bool(p.get_optional<std::string>("value"));
 ```
 
-设置一下deal.ii的库链接：
+3.设置一下deal.ii的库链接：
 ```
 sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 ```
