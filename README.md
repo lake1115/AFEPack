@@ -13,9 +13,19 @@
 首先安装如下依赖
 ```
 sudo apt-get install cmake g++ gcc automake autoconf mpich
-sudo apt-get install liblapack-dev libboost-all-dev libtbb-dev
+sudo apt-get install liblapack-dev libboost-all-dev libtbb-dev libbz2-dev
 sudo apt-get install libmumps-dev trilinos-all-dev libsuitesparse-dev libarpack2-dev
 ```
+
+做如下链接修改， 这里不确定这样做是否最好， 但至少可以继续下去。 （或者定义到你自己指定的一个目录下） 
+```
+sudo ln -s /usr/lib/x86_64-linux-gnu/libscalapack-openmpi.so /usr/local/lib/libscalapack.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotch-6.so /usr/lib/x86_64-linux-gnu/libptscotch.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libptscotcherr-6.so /usr/lib/x86_64-linux-gnu/libptscotcherr.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libscotch-6.so /usr/lib/x86_64-linux-gnu/libscotch.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libscotcherr-6.so /usr/lib/x86_64-linux-gnu/libscotcherr.so
+```
+
 **Boost-1.50.0**
 ```
 wget https://phoenixnap.dl.sourceforge.net/project/boost/boost/1.50.0/boost_1_50_0.tar.bz2
@@ -32,9 +42,7 @@ icu_fmt_->format(value,tmp); -> icu_fmt_->format(::int64_t(value),tmp);
 ```
 - 提示找不到pyconfig.h
   
-手动修改 project-config.jam文件
-
-18行处改为
+在project-config.jam, 18行处改为:
 ```
 Using python : 2.7 : /usr/include/python2.7 ;
 ```
@@ -60,14 +68,37 @@ return (p.get_optionalstd::string("value")); -> return bool(p.get_optionalstd::s
 ```
 根据 boost 安装路径修改
 ```
-export BOOST_DIR=/path/to/boost/install
+export BOOST_DIR=/path/to/boost/install //默认是在/usr/
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local/dealii-8.1.0 -DDEAL_II_WITH_MPI=on -DDEAL_II_WITH_THREADS=off -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -DCMAKE_Fortran_COMPILER=/usr/bin/mpifort -DDEAL_II_WITH_PETSC=OFF -DHDF5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi ..
 ```
-这里注意不要打开anaconda环境，不然会默认调用anaconda下cmake的boost-1.73.0
+- 提示调用系统或者anaconda下cmake的高版本boost，导致找不到安装的boost-1.50
+
+在CMakeList.txt, line 3, 插入：
+```
+cmake_policy(SET CMP0057 NEW)
+```
+ 
 ```
 make
 sudo make install
 ```
+
+OpenMPI 版本在4.0会出现很多错误：
+
+ - 出现GCC 11 build errors: 'numeric_limits' is not a member of 'std'
+
+在deal.II/include/deal.II/lac/vector.templates.h, 加入一行：
+```
+#include <limits>
+```
+
+ - error: ‘MPI_Type_struct’ was not declared in this scope
+
+在deal.II/source/base/mpi.cc, line 253, 如下修改:
+```
+ierr = MPI_Type_struct(2, lengths, displacements, types, &type); -> ierr = MPI_Type_create_struct(2, lengths, displacements, types, &type);
+```
+
 设置一下deal.ii的库链接：
 ```
 sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
