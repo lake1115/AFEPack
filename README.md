@@ -83,7 +83,7 @@ make
 sudo make install
 ```
 
-OpenMPI 版本在4.0会出现很多错误：
+在Ubuntu 22.04上由于GCC版本 和 OpenMPI版本不同，会出现很多错误：
 
  - 出现GCC 11 build errors: 'numeric_limits' is not a member of 'std'
 
@@ -97,6 +97,12 @@ OpenMPI 版本在4.0会出现很多错误：
 在deal.II/source/base/mpi.cc, line 253, 如下修改:
 ```
 ierr = MPI_Type_struct(2, lengths, displacements, types, &type); -> ierr = MPI_Type_create_struct(2, lengths, displacements, types, &type);
+```
+
+ - error: ‘const ptree’ {aka ‘const class boost::property_tree::basic_ptree<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> >’} has no member named ‘get_optionalstd’;
+在deal.II/source/base/parameter_handler.cc, line 1278, 如下修改:
+```
+return (p.get_optionalstd::string("value")); -> return bool(p.get_optional<std::string>("value"));
 ```
 
 设置一下deal.ii的库链接：
