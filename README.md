@@ -126,6 +126,12 @@ make
 sudo make install
 ```
 
+- deal.II依然出现'numeric_limits' is not a member of 'std'问题:
+  在/usr/local/dealii-8.1.0/include/deal.II/lac/solver_gmres.h, 加入一行：
+  ```
+  #include <limits>
+  ```
+
 需要在.bashrc中增加AFEPack path
 ```
 export AFEPACK_PATH="/usr/local/AFEPack"
