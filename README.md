@@ -116,7 +116,9 @@ return (p.get_optionalstd::string("value")); -> return bool(p.get_optional<std::
 sudo ln -s /usr/local/dealii-8.1.0/lib/* /usr/local/lib
 ```
 **AFEPack**
+将AFEPack在自己目录解开， sudo mv到安装目录（以下为/usr/local/AFEPack）：
 ```
+sudo mv AFEPack-master/
 cd /usr/local/AFEPack
 aclocal
 autoconf
