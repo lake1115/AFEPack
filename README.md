@@ -153,6 +153,10 @@ easymesh D.d
 
 终端运行dx，打开界面，然后在Import Data...中选择运行结果u.dx文件，得到可视化结果
 
+- thrilinos库可能由于版本更新有一些改变，需要手动修改一下Makefile,例如
+```
+libtrilinos_shylu.so -> libtrilinos_shylu_ddbddc.so libtrilinos_shylu_ddfrosch.so libtrilinos_shylu_ddcommon.so libtrilinos_shylu_nodehts.so
+```
 
 ## 调试AFEPack
 主要通过vscode来调试代码。需要在vscode扩展中安装C/C++ 和C/C++ Extension Pack
