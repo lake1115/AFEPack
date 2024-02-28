@@ -1,6 +1,7 @@
 # [AFEPack for TBC]
-
 ==============================
+- 增加了用Eigen求解复数node-based 和edge-based FEM
+- 增加了对开源网格生成库triangle数据的导入和输出
 
 ## Table of contents
  1. [安装AFEPack](#安装AFEPack)
